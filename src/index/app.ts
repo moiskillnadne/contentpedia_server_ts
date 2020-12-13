@@ -1,37 +1,50 @@
+import express from 'express'
+import * as Sentry from '@sentry/node'
+import * as Tracing from '@sentry/tracing'
 import c from 'colors'
 
-import Koa from 'koa'
-
-import bodyParser from 'koa-bodyparser'
-
-import cors from '@koa/cors'
-
-import { isProvided } from '@/util/common'
-
-import db from './db'
-
-import router from './route'
-
-import jwt from './middleware/jwt'
-import errorHandler from './middleware/errorHandler'
-
+// Settings
 const { PORT_SERVER } = process.env
-isProvided({ PORT_SERVER }, 'Env server')
+const app: express.Application = express()
+Sentry.init({
+  dsn: 'https://d7b6b6aee6884eed879d8d25a212ad09@o490705.ingest.sentry.io/5555124',
+  environment: process.env.ENVIRONMENT,
+  integrations: [
+    // enable HTTP calls tracing
+    new Sentry.Integrations.Http({ tracing: true }),
+    // enable Express.js middleware tracing
+    new Tracing.Integrations.Express({ app }),
+  ],
 
-const app = new Koa()
+  // We recommend adjusting this value in production, or using tracesSampler
+  // for finer control
+  tracesSampleRate: 1.0,
+})
 
-app.use(errorHandler())
+// RequestHandler creates a separate execution context using domains, so that every
+// transaction/span/breadcrumb is attached to its own Hub instance
+app.use(Sentry.Handlers.requestHandler())
+// TracingHandler creates a trace for every incoming request
+app.use(Sentry.Handlers.tracingHandler())
 
-app.use(bodyParser())
+// All controllers should live here
+app.get('/', function rootHandler(req, res) {
+  res.end('Hello world!')
+})
+app.get('/debug-sentry', function mainHandler(req, res) {
+  throw new Error('My first Sentry error!')
+})
 
-app.use(cors())
+// The error handler must be before any other error middleware and after all controllers
+app.use(Sentry.Handlers.errorHandler())
 
-app.use(jwt())
-
-app.use(router.routes())
-app.use(router.allowedMethods())
+// Optional fallthrough error handler
+app.use(function onError(err: Record<string, unknown>, req: any, res: any, next: any) {
+  // The error id is attached to `res.sentry` to be returned
+  // and optionally displayed to the user for support.
+  res.statusCode = 500
+  res.end(`${res.sentry}\n`)
+})
 
 // eslint-disable-next-line no-console
-db.authenticate(() => console.log(c.green('database connected')))
-// eslint-disable-next-line no-console
-app.listen(PORT_SERVER, () => console.log(c.green('server started')))
+app.listen(PORT_SERVER, () => console.log(`${c.green('Server successfuly started')} ${c.blue(`PORT: ${PORT_SERVER}`)}`))

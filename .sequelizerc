@@ -1,6 +1,0 @@
-module.exports = {
-  'config': './migrations/config/config.js',
-  'seeders-path': './migrations/seeders',
-  'migrations-path': './migrations/migrations',
-  'models-path': './migrations/models'
-}
