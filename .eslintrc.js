@@ -3,6 +3,7 @@
 module.exports = {
   plugins: ['import'],
   rules: {
+    'no-console': ['warn', { allow: ['warn', 'error'] }],
     'import/no-unresolved': 'error',
     'no-param-reassign': 'off',
     'default-case': 'off',
