@@ -21,6 +21,7 @@ module.exports = {
     '@typescript-eslint/no-use-before-define': ['off'],
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     'no-console': ['warn', { allow: ['warn', 'error'] }],
+    '@typescript-eslint/naming-convention': 'off',
   },
   extends: [
     'airbnb-typescript',

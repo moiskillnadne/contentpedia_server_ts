@@ -6,6 +6,8 @@ import bodyParser from 'body-parser'
 import mongoose from 'mongoose'
 
 import videoRouter from '@/route/videoDetails'
+import userRouter from '@/route/auth'
+import jwtMiddleware from '@/index/middleware/jwt'
 
 // Settings
 const { PORT_SERVER, DB_URI } = process.env
@@ -41,6 +43,7 @@ mongoose.set('useFindAndModify', false)
 
 app.use(bodyParser.urlencoded({ extended: false })) // parse application/x-www-form-urlencoded
 app.use(bodyParser.json()) // parse application/json
+app.use(jwtMiddleware)
 
 // RequestHandler creates a separate execution context using domains, so that every
 // transaction/span/breadcrumb is attached to its own Hub instance
@@ -51,6 +54,7 @@ app.use(Sentry.Handlers.tracingHandler())
 // All controllers should live here
 // Routes
 app.use('/api/v1/videoDetails/', videoRouter)
+app.use('/api/v1/auth', userRouter)
 
 app.get('/', function rootHandler(req: Request, res: Response) {
   res.end('Hello world!')
