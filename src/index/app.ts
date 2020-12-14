@@ -8,7 +8,7 @@ import mongoose from 'mongoose'
 import videoRouter from '@/route/videoDetails'
 
 // Settings
-const { PORT_SERVER, DB_URI_PROD } = process.env
+const { PORT_SERVER, DB_URI } = process.env
 const app = express()
 Sentry.init({
   dsn: 'https://d7b6b6aee6884eed879d8d25a212ad09@o490705.ingest.sentry.io/5555124',
@@ -26,7 +26,7 @@ Sentry.init({
   tracesSampleRate: 1.0,
 })
 mongoose.connect(
-  DB_URI_PROD as string,
+  DB_URI as string,
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -37,6 +37,7 @@ mongoose.connect(
     console.error(err)
   },
 )
+mongoose.set('useFindAndModify', false)
 
 app.use(bodyParser.urlencoded({ extended: false })) // parse application/x-www-form-urlencoded
 app.use(bodyParser.json()) // parse application/json
@@ -59,13 +60,13 @@ app.get('/', function rootHandler(req: Request, res: Response) {
 app.use(Sentry.Handlers.errorHandler())
 
 // Optional fallthrough error handler
-app.use(function onError(err: Error, req: Request, res: any) {
-  console.error(err)
-  // The error id is attached to `res.sentry` to be returned
-  // and optionally displayed to the user for support.
-  res.statusCode = 500
-  res.end(`${res.sentry}\n`)
-})
+// app.use(function onError(err: Error, req: Request, res: any, next: NextFunction) {
+//   console.error(err)
+//   // The error id is attached to `res.sentry` to be returned
+//   // and optionally displayed to the user for support.
+//   res.statusCode = 500
+//   res.end(`${res.sentry}\n`)
+// })
 
 // eslint-disable-next-line no-console
 app.listen(PORT_SERVER, () => console.log(`${c.green('Server successfuly started')} ${c.blue(`PORT: ${PORT_SERVER}`)}`))

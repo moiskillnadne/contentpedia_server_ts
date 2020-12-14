@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express'
 import VideoDetailsSchema from '@/model/videoDetails'
 
 import videoItemCreator from '@/util/videoItemCreator'
+import { errorHandler } from '@/util/common'
 
 const router = express.Router()
 
@@ -12,7 +13,7 @@ router.get('/', async (req: Request, res: Response) => {
 
     res.status(200).json(dbResult)
   } catch (err) {
-    throw new Error(`Getting items from DB failed! ${err.toString()}`)
+    errorHandler(err, res, 'Getting items from DB failed!')
   }
 })
 
@@ -27,12 +28,12 @@ router.post('/', async (req: Request, res: Response) => {
       success: result,
     })
   } catch (err) {
-    throw new Error(`Saving to DB failed! ${err.toString()}`)
+    errorHandler(err, res, 'Saving to DB failed!')
   }
 })
 
 router.delete('/:id', async (req: Request, res: Response) => {
-  const id = req.params.testItemId
+  const { id } = req.params
   try {
     const result = await VideoDetailsSchema.remove({ _id: id }).exec()
     res.status(200).json({
@@ -40,33 +41,37 @@ router.delete('/:id', async (req: Request, res: Response) => {
       success: result,
     })
   } catch (err) {
-    throw new Error(`Removing from DB failed! ${err.toString()}`)
+    errorHandler(err, res, 'Removing from DB failed!')
   }
 })
 
 router.put('/:id', async (req, res) => {
-  const id = req.params.testItemId
+  const { id } = req.params
   const { body } = req
 
-  // eslint-disable-next-line no-console
-  console.log(body)
-
   try {
-    const videoDetails = await VideoDetailsSchema.findOneAndUpdate({ _id: id }, body, { upsert: true }, function (
-      err,
-      doc,
-    ) {
-      // eslint-disable-next-line no-console
-      console.log(err)
-      // eslint-disable-next-line no-console
-      console.log(doc)
-      return 'ready'
-    })
+    const result = await VideoDetailsSchema.updateOne({ _id: id }, { $set: { ...body } })
+    if (result.ok) {
+      const video = await VideoDetailsSchema.findById(id).exec()
+      res.status(200).json({
+        msg: 'Successfuly updated!',
+        modifiedItem: video,
+      })
+    }
   } catch (err) {
-    throw new Error(`Item updating failed! ${err.toString()}`)
+    errorHandler(err, res, 'Item updating failed!')
   }
+})
 
-  res.status(200)
+router.get('/getOne/:id', async (req: Request, res: Response) => {
+  const { id } = req.params
+  try {
+    const video = await VideoDetailsSchema.findById(id).exec()
+    if (!video) res.status(204).json({ msg: 'Is empty!' })
+    res.status(200).json(video)
+  } catch (err) {
+    errorHandler(err, res, 'Getting item by ID failed!')
+  }
 })
 
 export default router

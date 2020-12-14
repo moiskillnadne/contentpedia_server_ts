@@ -1,4 +1,5 @@
 import c from 'colors'
+import { Response } from 'express'
 
 export function isProvided(obj: Record<string, unknown>, varsName?: string) {
   const keys = Object.keys(obj)
@@ -18,6 +19,7 @@ export function isProvided(obj: Record<string, unknown>, varsName?: string) {
   }
 }
 
-export function test() {
-  //
+export function errorHandler(err: Error, res: Response, msg: string) {
+  res.status(500).json({ msg: 'Something go wrong.. :/', error: err.toString() })
+  throw new Error(`${msg} ${err.toString()}`)
 }
