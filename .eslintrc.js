@@ -20,6 +20,7 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': ['warn'],
     '@typescript-eslint/no-use-before-define': ['off'],
     '@typescript-eslint/explicit-module-boundary-types': 'off',
+    'no-console': ['warn', { allow: ['warn', 'error'] }],
   },
   extends: [
     'airbnb-typescript',
