@@ -1,18 +1,18 @@
 import mongoose from 'mongoose'
-import VideoDetailsSchema from '@/db/model/videoDetails'
+import { VideoModel } from '@/db/model/videoDetails'
 import { DateTime } from 'luxon'
 import * as utils from '@/util/urlParser'
-import { ChannelModel, VideoModel, GuestModel, RecommendationModel } from '@/types/video'
+import { ChannelModel, VideoModelType, GuestModel, RecommendationModel } from '@/types/video'
 
 export default function videoItemCreator(
   channel: ChannelModel,
-  video: VideoModel,
+  video: VideoModelType,
   guest: GuestModel,
   recommendation: RecommendationModel,
 ) {
   const videoID = utils.getVideoIDFromUrl(video.url)
 
-  return new VideoDetailsSchema({
+  return new VideoModel({
     _id: new mongoose.Types.ObjectId(),
     channel: {
       name: channel.name,

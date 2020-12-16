@@ -2,7 +2,7 @@ import express, { Response } from 'express'
 import * as jwt from 'jsonwebtoken'
 
 // Utils
-import UserDetailsSchema from '@/db/model/user'
+import { UserModel } from '@/db/model/user'
 import { Request } from '@/types/types'
 import { errorHandler } from '@/util/common'
 
@@ -14,7 +14,7 @@ router.post('/login', async (req: Request, res: Response) => {
   let user
 
   try {
-    user = await UserDetailsSchema.findOne({ email }).exec()
+    user = await UserModel.findOne({ email }).exec()
   } catch (err) {
     errorHandler(err, res, 'Connection with DB lost!')
   }
@@ -22,7 +22,7 @@ router.post('/login', async (req: Request, res: Response) => {
   if (!user) res.status(401).json({ msg: 'User is not exist!' })
   if (user?.get('password') !== password) res.status(401).json({ msg: 'Password incorrect!' })
 
-  const tokens = generateJWT(user?._id)
+  const tokens = generateJWT(user?.get('_id'))
 
   res.status(200).json(tokens)
 })

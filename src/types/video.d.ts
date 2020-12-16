@@ -8,7 +8,7 @@ export type GuestModel = {
   profession?: string
 }
 
-export type VideoModel = {
+export type VideoModelType = {
   name: string
   url: string
 }

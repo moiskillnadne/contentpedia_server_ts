@@ -1,9 +1,9 @@
 import mongoose from 'mongoose'
-import UserDetailsSchema from '@/db/model/user'
+import { UserModel } from '@/db/model/user'
 import { DateTime } from 'luxon'
 
 export default function userCreator(email: string, password: string) {
-  return new UserDetailsSchema({
+  return new UserModel({
     _id: new mongoose.Types.ObjectId(),
     email,
     password,

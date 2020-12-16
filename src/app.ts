@@ -43,6 +43,7 @@ mongoose.connect(
   },
 )
 mongoose.set('useFindAndModify', false)
+mongoose.set('useCreateIndex', true)
 
 // Middlewares
 app.use(bodyParser.urlencoded({ extended: false }))

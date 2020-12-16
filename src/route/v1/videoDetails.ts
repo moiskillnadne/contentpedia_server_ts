@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express'
 
 // Utils
-import VideoDetailsSchema from '@/db/model/videoDetails'
+import { VideoModel } from '@/db/model/videoDetails'
 import videoItemCreator from '@/util/videoItemCreator'
 import { errorHandler } from '@/util/common'
 
@@ -9,7 +9,7 @@ const router = express.Router()
 
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const dbResult = await VideoDetailsSchema.find().exec()
+    const dbResult = await VideoModel.find().exec()
     if (!dbResult.length) res.status(204).json({ msg: 'Is empty!' })
 
     res.status(200).json(dbResult)
@@ -36,7 +36,7 @@ router.post('/', async (req: Request, res: Response) => {
 router.delete('/:id', async (req: Request, res: Response) => {
   const { id } = req.params
   try {
-    const result = await VideoDetailsSchema.remove({ _id: id }).exec()
+    const result = await VideoModel.remove({ _id: id }).exec()
     res.status(200).json({
       msg: 'Removed successful!',
       success: result,
@@ -51,9 +51,9 @@ router.put('/:id', async (req, res) => {
   const { body } = req
 
   try {
-    const result = await VideoDetailsSchema.updateOne({ _id: id }, { $set: { ...body } })
+    const result = await VideoModel.updateOne({ _id: id }, { $set: { ...body } })
     if (result.ok) {
-      const video = await VideoDetailsSchema.findById(id).exec()
+      const video = await VideoModel.findById(id).exec()
       res.status(200).json({
         msg: 'Successfuly updated!',
         modifiedItem: video,
@@ -67,7 +67,7 @@ router.put('/:id', async (req, res) => {
 router.get('/getOne/:id', async (req: Request, res: Response) => {
   const { id } = req.params
   try {
-    const video = await VideoDetailsSchema.findById(id).exec()
+    const video = await VideoModel.findById(id).exec()
     if (!video) res.status(204).json({ msg: 'Is empty!' })
     res.status(200).json(video)
   } catch (err) {
