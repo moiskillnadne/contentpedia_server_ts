@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express'
-import VideoDetailsSchema from '@/db/model/videoDetails'
 
+// Utils
+import VideoDetailsSchema from '@/db/model/videoDetails'
 import videoItemCreator from '@/util/videoItemCreator'
 import { errorHandler } from '@/util/common'
 

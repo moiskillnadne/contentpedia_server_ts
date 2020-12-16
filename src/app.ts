@@ -5,13 +5,15 @@ import c from 'colors'
 import bodyParser from 'body-parser'
 import mongoose from 'mongoose'
 
+// Utils
 import videoRouter from '@/route/v1/videoDetails'
 import userRouter from '@/route/v1/auth'
 import jwtMiddleware from '@/middleware/jwt'
 
-// Settings
 const { PORT_SERVER, DB_URI } = process.env
 const app = express()
+
+// Connections
 Sentry.init({
   dsn: 'https://d7b6b6aee6884eed879d8d25a212ad09@o490705.ingest.sentry.io/5555124',
   environment: process.env.ENVIRONMENT,
@@ -27,6 +29,7 @@ Sentry.init({
   // for finer control
   tracesSampleRate: 1.0,
 })
+
 mongoose.connect(
   DB_URI as string,
   {
@@ -41,36 +44,23 @@ mongoose.connect(
 )
 mongoose.set('useFindAndModify', false)
 
-app.use(bodyParser.urlencoded({ extended: false })) // parse application/x-www-form-urlencoded
-app.use(bodyParser.json()) // parse application/json
+// Middlewares
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
 app.use(jwtMiddleware)
-
-// RequestHandler creates a separate execution context using domains, so that every
-// transaction/span/breadcrumb is attached to its own Hub instance
 app.use(Sentry.Handlers.requestHandler())
-// TracingHandler creates a trace for every incoming request
-app.use(Sentry.Handlers.tracingHandler())
+app.use(Sentry.Handlers.tracingHandler()) // TracingHandler creates a trace for every incoming request
 
-// All controllers should live here
 // Routes
 app.use('/api/v1/videoDetails/', videoRouter)
 app.use('/api/v1/auth', userRouter)
 
+// Test
 app.get('/', function rootHandler(req: Request, res: Response) {
   res.end('Hello world!')
 })
 
-// The error handler must be before any other error middleware and after all controllers
-app.use(Sentry.Handlers.errorHandler())
-
-// Optional fallthrough error handler
-// app.use(function onError(err: Error, req: Request, res: any, next: NextFunction) {
-//   console.error(err)
-//   // The error id is attached to `res.sentry` to be returned
-//   // and optionally displayed to the user for support.
-//   res.statusCode = 500
-//   res.end(`${res.sentry}\n`)
-// })
+app.use(Sentry.Handlers.errorHandler()) // The error handler must be before any other error middleware and after all controllers
 
 // eslint-disable-next-line no-console
 app.listen(PORT_SERVER, () => console.log(`${c.green('Server successfuly started')} ${c.blue(`PORT: ${PORT_SERVER}`)}`))

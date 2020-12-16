@@ -1,10 +1,9 @@
 import express, { Response } from 'express'
-import UserDetailsSchema from '@/db/model/user'
 import * as jwt from 'jsonwebtoken'
 
+// Utils
+import UserDetailsSchema from '@/db/model/user'
 import { Request } from '@/types/types'
-
-// import userCreator from '@/util/userCreator'
 import { errorHandler } from '@/util/common'
 
 const router = express.Router()
