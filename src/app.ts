@@ -5,9 +5,9 @@ import c from 'colors'
 import bodyParser from 'body-parser'
 import mongoose from 'mongoose'
 
-import videoRouter from '@/route/videoDetails'
-import userRouter from '@/route/auth'
-import jwtMiddleware from '@/index/middleware/jwt'
+import videoRouter from '@/route/v1/videoDetails'
+import userRouter from '@/route/v1/auth'
+import jwtMiddleware from '@/middleware/jwt'
 
 // Settings
 const { PORT_SERVER, DB_URI } = process.env

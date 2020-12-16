@@ -1,5 +1,5 @@
 import express, { Response } from 'express'
-import UserDetailsSchema from '@/model/user'
+import UserDetailsSchema from '@/db/model/user'
 import * as jwt from 'jsonwebtoken'
 
 import { Request } from '@/types/types'

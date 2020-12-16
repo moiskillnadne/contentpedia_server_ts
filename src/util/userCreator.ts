@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import UserDetailsSchema from '@/model/user'
+import UserDetailsSchema from '@/db/model/user'
 import { DateTime } from 'luxon'
 
 export default function userCreator(email: string, password: string) {

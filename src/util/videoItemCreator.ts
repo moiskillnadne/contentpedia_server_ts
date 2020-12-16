@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import VideoDetailsSchema from '@/model/videoDetails'
+import VideoDetailsSchema from '@/db/model/videoDetails'
 import { DateTime } from 'luxon'
 import * as utils from '@/util/urlParser'
 import { ChannelModel, VideoModel, GuestModel, RecommendationModel } from '@/types/video'
