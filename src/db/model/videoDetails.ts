@@ -1,7 +1,7 @@
 import { model, Schema, Document, SchemaTypes, Types } from 'mongoose'
 
 export const DOCUMENT_NAME = 'Video'
-export const COLLECTION_NAME = 'videos'
+export const COLLECTION_NAME = 'videodetails'
 
 export default interface Video extends Document {
   _id: Types.ObjectId

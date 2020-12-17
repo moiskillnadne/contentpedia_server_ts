@@ -1,5 +1,6 @@
 import express, { Response } from 'express'
 import * as jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
 
 // Utils
 import { UserModel } from '@/db/model/user'
@@ -10,7 +11,6 @@ const router = express.Router()
 
 router.post('/login', async (req: Request, res: Response) => {
   const { email, password } = req.body
-
   let user
 
   try {
@@ -20,7 +20,8 @@ router.post('/login', async (req: Request, res: Response) => {
   }
 
   if (!user) res.status(401).json({ msg: 'User is not exist!' })
-  if (user?.get('password') !== password) res.status(401).json({ msg: 'Password incorrect!' })
+  const isCompare = await bcrypt.compareSync(password, user?.get('password'))
+  if (!isCompare) res.status(401).json({ msg: 'Password incorrect!' })
 
   const tokens = generateJWT(user?.get('_id'))
 
@@ -47,5 +48,11 @@ function generateJWT(id: string) {
     refreshToken,
   }
 }
+
+// async function hashPassword(password: any) {
+//   const salt = await bcrypt.genSalt(10)
+//   const hash = await bcrypt.hash(password, salt)
+//   console.log(hash)
+// }
 
 export default router
