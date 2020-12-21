@@ -3,5 +3,5 @@ export function formatterToPreviewLink(videoId: string) {
 }
 
 export function getVideoIDFromUrl(videoUrl: string) {
-  return videoUrl.replace('https://www.youtube.com/watch?v=', '')
+  return videoUrl.replace('https://www.youtube.com/watch?v=', '').replace('https://youtu.be/', '')
 }

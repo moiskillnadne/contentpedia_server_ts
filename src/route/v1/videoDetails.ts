@@ -4,6 +4,7 @@ import express, { Request, Response } from 'express'
 import { VideoModel } from '@/db/model/videoDetails'
 import videoItemCreator from '@/util/videoItemCreator'
 import { errorHandler } from '@/util/common'
+import { formatterToPreviewLink, getVideoIDFromUrl } from '@/util/urlParser'
 
 const router = express.Router()
 
@@ -73,6 +74,18 @@ router.get('/getOne/:id', async (req: Request, res: Response) => {
   } catch (err) {
     errorHandler(err, res, 'Getting item by ID failed!')
   }
+})
+
+router.post('/getPreviewLink', (req: Request, res: Response) => {
+  const { videoLink } = req.body
+  if (!videoLink)
+    res.status(404).json({
+      msg: 'Video link is empty!',
+    })
+
+  const id = getVideoIDFromUrl(videoLink)
+  const previewLink = formatterToPreviewLink(id)
+  res.status(200).json(previewLink)
 })
 
 export default router
