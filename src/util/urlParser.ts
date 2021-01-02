@@ -1,5 +1,5 @@
 export function formatterToPreviewLink(videoId: string) {
-  return `http://i1.ytimg.com/vi/${videoId}/maxresdefault.jpg`
+  return `https://i1.ytimg.com/vi/${videoId}/maxresdefault.jpg`
 }
 
 export function getVideoIDFromUrl(videoUrl: string) {
