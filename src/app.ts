@@ -16,7 +16,6 @@ const app = express()
 // Connections
 Sentry.init({
   dsn: 'https://d7b6b6aee6884eed879d8d25a212ad09@o490705.ingest.sentry.io/5555124',
-  environment: process.env.ENVIRONMENT,
   integrations: [
     // enable HTTP calls tracing
     new Sentry.Integrations.Http({ tracing: true }),
@@ -46,11 +45,11 @@ mongoose.set('useFindAndModify', false)
 mongoose.set('useCreateIndex', true)
 
 // Middlewares
+app.use(Sentry.Handlers.requestHandler())
+app.use(Sentry.Handlers.tracingHandler()) // TracingHandler creates a trace for every incoming request
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(jwtMiddleware)
-app.use(Sentry.Handlers.requestHandler())
-app.use(Sentry.Handlers.tracingHandler()) // TracingHandler creates a trace for every incoming request
 
 // Routes
 app.use('/api/v1/videoDetails/', videoRouter)
