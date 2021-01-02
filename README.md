@@ -24,10 +24,10 @@ Builds the app for production to the `build` folder.<br />
 - Add `.env` file with following keys
 
 ```yml
-NODE_ENV=production
-PORT_SERVER=5555
-DB_URI=mongodb+srv://victor_ryabkov:Ryabkov2607.@contentpedia.k4rqg.mongodb.net/contentpedia_dev?retryWrites=true&w=majority
-JWT_SECRET=contentpedia
+NODE_ENV=something
+PORT_SERVER=something
+DB_URI=something
+JWT_SECRET=something
 ```
 
 - Run `NODE_ENV='development' sequelize-cli db:migrate`
