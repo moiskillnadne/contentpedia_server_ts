@@ -1,6 +1,6 @@
 import express, { Response } from 'express'
 import * as jwt from 'jsonwebtoken'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 
 // Utils
 import { UserModel } from '@/db/model/user'
