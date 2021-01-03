@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: rm -rf build
-      - run: yarn
-      - run: yarn build
+      - run: npm install
+      - run: npm run build
       - run: cp -r /root/actions-runner-server/_work/contentpedia_server_ts/contentpedia_server_ts/build/* /root/ContentPedia/contentpedia_server_ts
       - run: pm2 restart cp_server_ts
