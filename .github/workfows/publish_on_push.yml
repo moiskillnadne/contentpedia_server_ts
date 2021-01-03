@@ -23,4 +23,4 @@ jobs:
       - run: yarn
       - run: yarn build
       - run: cp -r /root/actions-runner-server/_work/contentpedia_server_ts/contentpedia_server_ts/build/* /root/ContentPedia/contentpedia_server_ts
-      - run: pm2 restart 0
+      - run: pm2 restart cp_server_ts
