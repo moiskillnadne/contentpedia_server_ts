@@ -184,11 +184,9 @@ module.exports = function(webpackEnv) {
                 useTypescriptIncrementalApi: true,
                 checkSyntacticErrors: true,
                 resolveModuleNameModule: process.versions.pnp ?
-                    `${__dirname}/pnpTs.js` :
-                    undefined,
+                    `${__dirname}/pnpTs.js` : undefined,
                 resolveTypeReferenceDirectiveModule: process.versions.pnp ?
-                    `${__dirname}/pnpTs.js` :
-                    undefined,
+                    `${__dirname}/pnpTs.js` : undefined,
                 tsconfig: paths.appTsConfig,
                 reportFiles: [
                     '**',
