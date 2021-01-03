@@ -1,0 +1,26 @@
+name: PUBLISH_ON_PUSH
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        node-version: [15.x]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: rm -rf build
+      - run: yarn
+      - run: yarn build
+      - run: cp -r /root/actions-runner-server/_work/contentpedia_server_ts/contentpedia_server_ts/build/* /root/ContentPedia/contentpedia_server_ts
+      - run: pm2 restart 0

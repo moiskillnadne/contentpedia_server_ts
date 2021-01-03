@@ -1,21 +1,21 @@
-'use strict';
+'use strict'
 
-const fs = require('fs');
-const path = require('path');
-const webpack = require('webpack');
+const fs = require('fs')
+const path = require('path')
+const webpack = require('webpack')
 const nodeExternals = require('webpack-node-externals')
-const resolve = require('resolve');
-const PnpWebpackPlugin = require('pnp-webpack-plugin');
-const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
-const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
-const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
-const paths = require('./paths');
-const modules = require('./modules');
-const getClientEnvironment = require('./env');
-const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
-const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpackPlugin');
-const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
-const resolveTsconfigPathsToAlias = require('./resolveTsconfigPathsToWebpackAlias.js');
+const resolve = require('resolve')
+const PnpWebpackPlugin = require('pnp-webpack-plugin')
+const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
+const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin')
+const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin')
+const paths = require('./paths')
+const modules = require('./modules')
+const getClientEnvironment = require('./env')
+const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin')
+const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpackPlugin')
+const typescriptFormatter = require('react-dev-utils/typescriptFormatter')
+const resolveTsconfigPathsToAlias = require('./resolveTsconfigPathsToWebpackAlias.js')
 
 const tsconfigPathAliases = resolveTsconfigPathsToAlias({
     tsconfigPath: '../tsconfig.json', // Using custom path
@@ -23,21 +23,15 @@ const tsconfigPathAliases = resolveTsconfigPathsToAlias({
 })
 
 // Check if TypeScript is setup
-const useTypeScript = fs.existsSync(paths.appTsConfig);
+const useTypeScript = fs.existsSync(paths.appTsConfig)
 
 // This is the production and development configuration.
 // It is focused on developer experience, fast rebuilds, and a minimal bundle.
 module.exports = function(webpackEnv) {
-    const isEnvDevelopment = webpackEnv === 'development';
-    const isEnvProduction = webpackEnv === 'production';
-
-    // Variable used for enabling profiling in Production
-    // passed into alias object. Uses a flag if passed into the build command
-    const isEnvProductionProfile =
-        isEnvProduction && process.argv.includes('--profile');
-
-    // Get environment variables to inject into our app.
-    const env = getClientEnvironment();
+    const isEnvDevelopment = webpackEnv === 'development'
+    const isEnvProduction = webpackEnv === 'production'
+        // Get environment variables to inject into our app.
+    const env = getClientEnvironment()
 
     return {
         mode: isEnvProduction ? 'production' : isEnvDevelopment && 'development',
@@ -65,9 +59,7 @@ module.exports = function(webpackEnv) {
             // We placed these paths second because we want `node_modules` to "win"
             // if there are any conflicts. This matches Node resolution mechanism.
             // https://github.com/facebook/create-react-app/issues/253
-            modules: ['node_modules', paths.appNodeModules].concat(
-                modules.additionalModulePaths || []
-            ),
+            modules: ['node_modules', paths.appNodeModules].concat(modules.additionalModulePaths || []),
             // These are the reasonable defaults supported by the Node ecosystem.
             // We also include JSX as a common component filename extension to support
             // some tools, although we do not recommend using it, see:
@@ -75,8 +67,8 @@ module.exports = function(webpackEnv) {
             // `web` extension prefixes have been added for better support
             // for React Native Web.
             extensions: paths.moduleFileExtensions
-                .map(ext => `.${ext}`)
-                .filter(ext => useTypeScript || !ext.includes('ts')),
+                .map((ext) => `.${ext}`)
+                .filter((ext) => useTypeScript || !ext.includes('ts')),
             alias: {
                 ...(modules.webpackAliases || {}),
                 ...tsconfigPathAliases,
@@ -105,24 +97,6 @@ module.exports = function(webpackEnv) {
             rules: [
                 // Disable require.ensure as it's not a standard language feature.
                 { parser: { requireEnsure: false } },
-
-                // First, run the linter.
-                // It's important to do this before Babel processes the JS.
-                {
-                    test: /\.(js|mjs|jsx|ts|tsx)$/,
-                    enforce: 'pre',
-                    use: [{
-                        options: {
-                            cache: true,
-                            formatter: require.resolve('react-dev-utils/eslintFormatter'),
-                            eslintPath: require.resolve('eslint'),
-                            resolvePluginsRelativeTo: __dirname,
-
-                        },
-                        loader: require.resolve('eslint-loader'),
-                    }, ],
-                    include: paths.appSrc,
-                },
                 {
                     // "oneOf" will traverse all following loaders until one will
                     // match the requirements. When no loader matches it will fall
@@ -166,8 +140,7 @@ module.exports = function(webpackEnv) {
             // to restart the development server for webpack to discover it. This plugin
             // makes the discovery automatic so you don't have to restart.
             // See https://github.com/facebook/create-react-app/issues/186
-            isEnvDevelopment &&
-            new WatchMissingNodeModulesPlugin(paths.appNodeModules),
+            isEnvDevelopment && new WatchMissingNodeModulesPlugin(paths.appNodeModules),
             // Moment.js is an extremely popular library that bundles large locale files
             // by default due to how webpack interprets its code. This is a practical
             // solution that requires the user to opt into importing specific locales.
@@ -183,10 +156,8 @@ module.exports = function(webpackEnv) {
                 async: isEnvDevelopment,
                 useTypescriptIncrementalApi: true,
                 checkSyntacticErrors: true,
-                resolveModuleNameModule: process.versions.pnp ?
-                    `${__dirname}/pnpTs.js` : undefined,
-                resolveTypeReferenceDirectiveModule: process.versions.pnp ?
-                    `${__dirname}/pnpTs.js` : undefined,
+                resolveModuleNameModule: process.versions.pnp ? `${__dirname}/pnpTs.js` : undefined,
+                resolveTypeReferenceDirectiveModule: process.versions.pnp ? `${__dirname}/pnpTs.js` : undefined,
                 tsconfig: paths.appTsConfig,
                 reportFiles: [
                     '**',
@@ -202,19 +173,20 @@ module.exports = function(webpackEnv) {
         ].filter(Boolean),
         // Some libraries import Node modules but don't use them in the browser.
         // Tell webpack to provide empty mocks for them so importing them works.
-        node: {
-            module: 'empty',
-            dgram: 'empty',
-            dns: 'mock',
-            fs: 'empty',
-            http2: 'empty',
-            net: 'empty',
-            tls: 'empty',
-            child_process: 'empty',
-        },
-        externals: [isEnvDevelopment && nodeExternals()].filter(Boolean),
+        // node: {
+        //   module: 'empty',
+        //   dgram: 'empty',
+        //   dns: 'mock',
+        //   fs: 'empty',
+        //   http2: 'empty',
+        //   net: 'empty',
+        //   tls: 'empty',
+        //   child_process: 'empty',
+        // },
+        target: 'node',
+        // externals: [isEnvDevelopment && nodeExternals()].filter(Boolean),
         // Turn off performance processing because we utilize
         // our own hints via the FileSizeReporter
         performance: false,
-    };
-};
+    }
+}
