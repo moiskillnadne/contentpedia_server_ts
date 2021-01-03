@@ -10,7 +10,7 @@ import videoRouter from '@/route/v1/videoDetails'
 import userRouter from '@/route/v1/auth'
 import jwtMiddleware from '@/middleware/jwt'
 
-const { PORT_SERVER, DB_URI } = process.env
+const { PORT_SERVER = 5555, DB_URI } = process.env
 const app = express()
 
 // Connections
@@ -29,18 +29,18 @@ Sentry.init({
   tracesSampleRate: 1.0,
 })
 
-mongoose.connect(
-  DB_URI as string,
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  },
-  (err) => {
-    if (!err) return
-    console.error(c.red('Server cant connect to DB'))
-    console.error(err)
-  },
-)
+mongoose.connect(DB_URI as string, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+mongoose.connection.on('connected', () => {
+  console.info(c.green('Connected to DB successfuly!'))
+})
+mongoose.connection.on('error', (err) => {
+  if (!err) return
+  console.error(c.red('Connect to DB failed!'))
+  console.error(err)
+})
 mongoose.set('useFindAndModify', false)
 mongoose.set('useCreateIndex', true)
 
@@ -62,5 +62,6 @@ app.get('/', function rootHandler(req: Request, res: Response) {
 
 app.use(Sentry.Handlers.errorHandler()) // The error handler must be before any other error middleware and after all controllers
 
-// eslint-disable-next-line no-console
-app.listen(PORT_SERVER, () => console.log(`${c.green('Server successfuly started')} ${c.blue(`PORT: ${PORT_SERVER}`)}`))
+app.listen(PORT_SERVER, () =>
+  console.info(`${c.green('Server successfuly started')} ${c.blue(`PORT: ${PORT_SERVER}`)}`),
+)

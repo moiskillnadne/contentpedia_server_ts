@@ -52,7 +52,7 @@ module.exports = function(webpackEnv) {
             filename: paths.buildFile,
         },
         optimization: {
-            minimize: true,
+            minimize: isEnvProduction,
         },
         resolve: {
             // This allows you to set a fallback for where webpack should look for modules.
@@ -126,12 +126,6 @@ module.exports = function(webpackEnv) {
             // This gives some necessary context to module not found errors, such as
             // the requesting resource.
             new ModuleNotFoundPlugin(paths.appPath),
-            // Makes some environment variables available to the JS code, for example:
-            // if (process.env.NODE_ENV === 'production') { ... }. See `./env.js`.
-            // It is absolutely essential that NODE_ENV is set to production
-            // during a production build.
-            // Otherwise React will be compiled in the very slow development mode.
-            new webpack.DefinePlugin(env.stringified),
             // Watcher doesn't work well if you mistype casing in a path so we use
             // a plugin that prints an error when you attempt to do this.
             // See https://github.com/facebook/create-react-app/issues/240
@@ -171,20 +165,12 @@ module.exports = function(webpackEnv) {
                 formatter: isEnvProduction ? typescriptFormatter : undefined,
             }),
         ].filter(Boolean),
-        // Some libraries import Node modules but don't use them in the browser.
-        // Tell webpack to provide empty mocks for them so importing them works.
-        // node: {
-        //   module: 'empty',
-        //   dgram: 'empty',
-        //   dns: 'mock',
-        //   fs: 'empty',
-        //   http2: 'empty',
-        //   net: 'empty',
-        //   tls: 'empty',
-        //   child_process: 'empty',
-        // },
         target: 'node',
-        // externals: [isEnvDevelopment && nodeExternals()].filter(Boolean),
+        externals: [
+            isEnvDevelopment && nodeExternals(),
+            'mongodb-client-encryption',
+            'saslprep'
+        ].filter(Boolean),
         // Turn off performance processing because we utilize
         // our own hints via the FileSizeReporter
         performance: false,
