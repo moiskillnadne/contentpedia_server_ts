@@ -1,65 +1,10 @@
-import { model, Schema, Document, SchemaTypes, Types } from 'mongoose'
+import { model, Schema, SchemaTypes } from 'mongoose'
+import * as Vmodel from '@/common/types/videoModel'
 
 export const DOCUMENT_NAME = 'Video'
 export const COLLECTION_NAME = 'videodetails'
 
-export default interface Video extends Document {
-  _id: Types.ObjectId
-  channel: {
-    name: string
-  }
-  video: {
-    name: string
-    url: string
-    previewUrl: string
-  }
-  guest: {
-    name: string
-    age: string
-    profession: string
-  }
-  recommendation: {
-    videoContent: [
-      {
-        type: {
-          type: string
-        }
-        title: string
-        timecode: string
-        url: string
-        comment: string
-        tags: string
-      },
-    ]
-    audioContent: [
-      {
-        type: {
-          type: string
-        }
-        title: string
-        timecode: string
-        url: string
-        comment: string
-        tags: string
-      },
-    ]
-    textContent: [
-      {
-        type: {
-          type: string
-        }
-        title: string
-        timecode: string
-        url: string
-        comment: string
-        tags: string
-      },
-    ]
-  }
-  timestamp: string
-}
-
-const videoSchema: Schema = new Schema({
+const videoSchema: Schema = new Schema<Vmodel.ReleaseModel>({
   _id: SchemaTypes.ObjectId,
   channel: {
     name: {
@@ -96,7 +41,7 @@ const videoSchema: Schema = new Schema({
     },
   },
   recommendation: {
-    videoContent: [
+    video: [
       {
         type: {
           type: String,
@@ -124,7 +69,7 @@ const videoSchema: Schema = new Schema({
         },
       },
     ],
-    audioContent: [
+    audio: [
       {
         type: {
           type: String,
@@ -152,7 +97,7 @@ const videoSchema: Schema = new Schema({
         },
       },
     ],
-    textContent: [
+    text: [
       {
         type: {
           type: String,

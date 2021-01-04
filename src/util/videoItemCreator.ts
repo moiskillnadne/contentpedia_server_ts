@@ -2,13 +2,13 @@ import mongoose from 'mongoose'
 import { VideoModel } from '@/db/model/videoDetails'
 import { DateTime } from 'luxon'
 import * as utils from '@/util/urlParser'
-import { ChannelModel, VideoModelType, GuestModel, RecommendationModel } from '@/types/video'
+import * as model from '@/common/types/videoModel'
 
 export default function videoItemCreator(
-  channel: ChannelModel,
-  video: VideoModelType,
-  guest: GuestModel,
-  recommendation: RecommendationModel,
+  channel: model.ChannelModel,
+  video: model.VideoDetailsModel,
+  guest: model.GuestModel,
+  recommendation: model.RecommendationModel,
 ) {
   const videoID = utils.getVideoIDFromUrl(video.url)
 
@@ -28,9 +28,9 @@ export default function videoItemCreator(
       profession: guest.profession || null,
     },
     recommendation: {
-      videoContent: recommendation.videoContent,
-      audioContent: recommendation.audioContent,
-      textContent: recommendation.textContent,
+      video: recommendation.video,
+      audio: recommendation.audio,
+      text: recommendation.text,
     },
     timestamp: DateTime.local().setZone('Europe/Moscow').toFormat('dd.MM.yyyy'),
   })

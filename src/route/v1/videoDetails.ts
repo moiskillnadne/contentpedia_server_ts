@@ -78,10 +78,12 @@ router.get('/getOne/:id', async (req: Request, res: Response) => {
 
 router.post('/getPreviewLink', (req: Request, res: Response) => {
   const { videoLink } = req.body
-  if (!videoLink)
+  if (!videoLink) {
+    console.info(videoLink)
     res.status(404).json({
       msg: 'Video link is empty!',
     })
+  }
 
   const id = getVideoIDFromUrl(videoLink)
   const previewLink = formatterToPreviewLink(id)
