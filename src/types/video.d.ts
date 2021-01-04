@@ -21,7 +21,7 @@ export type RecommendationModel = {
 
 export type ContentModel = {
   type: string
-  name: string
+  title: string
   timecode: string
   url: string
   comment?: string

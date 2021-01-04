@@ -24,7 +24,7 @@ export default interface Video extends Document {
         type: {
           type: string
         }
-        name: string
+        title: string
         timecode: string
         url: string
         comment: string
@@ -36,7 +36,7 @@ export default interface Video extends Document {
         type: {
           type: string
         }
-        name: string
+        title: string
         timecode: string
         url: string
         comment: string
@@ -48,7 +48,7 @@ export default interface Video extends Document {
         type: {
           type: string
         }
-        name: string
+        title: string
         timecode: string
         url: string
         comment: string
@@ -102,7 +102,7 @@ const videoSchema: Schema = new Schema({
           type: String,
           required: true,
         },
-        name: {
+        title: {
           type: String,
           required: true,
         },
@@ -130,7 +130,7 @@ const videoSchema: Schema = new Schema({
           type: String,
           required: true,
         },
-        name: {
+        title: {
           type: String,
           required: true,
         },
@@ -158,7 +158,7 @@ const videoSchema: Schema = new Schema({
           type: String,
           required: true,
         },
-        name: {
+        title: {
           type: String,
           required: true,
         },
