@@ -1,3 +1,5 @@
+export const TEST = "TEST"
+
 export const channelBlockOption = [
   {
     defaultValue: 'true',
