@@ -36,7 +36,8 @@ export type RecommendationModel = DeepReadonly<{
 }>
 
 export type RecommendationContentModel = DeepReadonly<{
-  id: string
+  id?: string
+  _id?: string
   type: string
   title: string
   timecode: string
