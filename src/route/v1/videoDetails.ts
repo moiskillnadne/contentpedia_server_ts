@@ -1,14 +1,16 @@
-import express, { Request, Response } from 'express'
+import express, { Response } from 'express'
 
 // Utils
 import { VideoModel } from '@/db/model/videoDetails'
 import videoItemCreator from '@/util/videoItemCreator'
 import { errorHandler } from '@/util/common'
 import { formatterToPreviewLink, getVideoIDFromUrl } from '@/util/urlParser'
+import { Request } from '@/types/types'
 
 const router = express.Router()
 
 router.get('/', async (req: Request, res: Response) => {
+  req.protect?.()
   try {
     const dbResult = await VideoModel.find().exec()
     if (!dbResult.length) res.status(204).json({ msg: 'Is empty!' })
@@ -20,6 +22,7 @@ router.get('/', async (req: Request, res: Response) => {
 })
 
 router.post('/', async (req: Request, res: Response) => {
+  req.protect?.()
   const { channel, video, guest, recommendation } = req.body
 
   try {
@@ -35,6 +38,7 @@ router.post('/', async (req: Request, res: Response) => {
 })
 
 router.delete('/:id', async (req: Request, res: Response) => {
+  req.protect?.()
   const { id } = req.params
   try {
     const result = await VideoModel.remove({ _id: id }).exec()
@@ -47,7 +51,8 @@ router.delete('/:id', async (req: Request, res: Response) => {
   }
 })
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', async (req: Request, res: Response) => {
+  req.protect?.()
   const { id } = req.params
   const { body } = req
 
@@ -66,6 +71,7 @@ router.put('/:id', async (req, res) => {
 })
 
 router.get('/getOne/:id', async (req: Request, res: Response) => {
+  req.protect?.()
   const { id } = req.params
   try {
     const video = await VideoModel.findById(id).exec()
@@ -77,6 +83,7 @@ router.get('/getOne/:id', async (req: Request, res: Response) => {
 })
 
 router.post('/getPreviewLink', (req: Request, res: Response) => {
+  req.protect?.()
   const { videoLink } = req.body
   if (!videoLink) {
     console.info(videoLink)

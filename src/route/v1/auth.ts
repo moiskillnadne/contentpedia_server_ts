@@ -28,7 +28,7 @@ router.post('/login', async (req: Request, res: Response) => {
   res.status(200).json(tokens)
 })
 
-router.get('/refresh', async (req: Request, res: Response) => {
+router.post('/refresh', async (req: Request, res: Response) => {
   req.protect?.()
   const tokens = generateJWT('123')
 
@@ -40,7 +40,7 @@ function generateJWT(id: string) {
   const expirationDate = new Date(today)
   expirationDate.setDate(today.getDate() + 60)
 
-  const token = jwt.sign({ id }, process.env.JWT_SECRET || '', { expiresIn: '1h' })
+  const token = jwt.sign({ id }, process.env.JWT_SECRET || '', { expiresIn: '5000ms' })
   const refreshToken = jwt.sign({ id }, process.env.JWT_SECRET || '', { expiresIn: '37d' })
 
   return {
