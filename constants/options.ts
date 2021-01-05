@@ -1,4 +1,4 @@
-export const TEST = "TEST"
+export const TEST = 'TEST'
 
 export const channelBlockOption = [
   {
@@ -13,10 +13,6 @@ export const channelBlockOption = [
   {
     value: 'https://www.youtube.com/channel/UCK8xpGAv8Oz7iMPgMw9j0LA',
     text: 'KUJI',
-  },
-  {
-    value: 'https://www.youtube.com/channel/UCClgnrIfArlWVWvaPc7KF7w',
-    text: 'Асафьев. Жизнь',
   },
   {
     value: 'https://www.youtube.com/channel/UCClgnrIfArlWVWvaPc7KF7w',
