@@ -86,7 +86,6 @@ router.post('/getPreviewLink', (req: Request, res: Response) => {
   req.protect?.()
   const { videoLink } = req.body
   if (!videoLink) {
-    console.info(videoLink)
     res.status(404).json({
       msg: 'Video link is empty!',
     })

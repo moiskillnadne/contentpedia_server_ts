@@ -13,10 +13,8 @@ export default function (req: Request, res: Response, next: NextFunction) {
 
     req.protect = function (): any {
       try {
-        console.log(jwt.verify(token, process.env.JWT_SECRET || ''))
         return jwt.verify(token, process.env.JWT_SECRET || '')
       } catch (err) {
-        console.log('CATCH BLOCK')
         res.status(401).json({ msg: 'Token expired!' })
         next(new Error('AXuet'))
       }
