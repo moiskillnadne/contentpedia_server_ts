@@ -40,7 +40,7 @@ function generateJWT(id: string) {
   const expirationDate = new Date(today)
   expirationDate.setDate(today.getDate() + 60)
 
-  const token = jwt.sign({ id }, process.env.JWT_SECRET || '', { expiresIn: '5000ms' })
+  const token = jwt.sign({ id }, process.env.JWT_SECRET || '', { expiresIn: `${60000 * 10}ms` })
   const refreshToken = jwt.sign({ id }, process.env.JWT_SECRET || '', { expiresIn: '37d' })
 
   return {
