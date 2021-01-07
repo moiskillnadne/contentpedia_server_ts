@@ -1,32 +1,33 @@
 import 'reflect-metadata'
-import { MikroORM } from '@mikro-orm/core'
+import * as Tracing from '@sentry/tracing'
 import express, { Request, Response } from 'express'
 import * as Sentry from '@sentry/node'
 import c from 'colors'
 import bodyParser from 'body-parser'
-import { Initer } from '@/init'
 
 // Utils
 import videoRouter from '@/route/v1/videoDetails'
 import userRouter from '@/route/v1/auth'
 import jwtMiddleware from '@/middleware/jwt'
 
-const { PORT_SERVER = 5555, DB_URI } = process.env
+const { PORT_SERVER = 5555 } = process.env
 const app = express()
 
 // Connections
-const init = new Initer(app)
-init.sentry()
-// init.mikroorm()
-const microInit = async () => {
-  const orm = await MikroORM.init({
-    type: 'mongo',
-    clientUrl: DB_URI,
-    dbName: 'contentpedia_dev',
-  })
-  console.log(orm.em)
-}
-microInit()
+Sentry.init({
+  dsn: 'https://d7b6b6aee6884eed879d8d25a212ad09@o490705.ingest.sentry.io/5555124',
+  integrations: [
+    // enable HTTP calls tracing
+    new Sentry.Integrations.Http({ tracing: true }),
+    // enable Express.js middleware tracing
+    new Tracing.Integrations.Express({ app }),
+    new Tracing.Integrations.Mongo(),
+  ],
+
+  // We recommend adjusting this value in production, or using tracesSampler
+  // for finer control
+  tracesSampleRate: 1.0,
+})
 
 // Middlewares
 app.use(Sentry.Handlers.requestHandler())
