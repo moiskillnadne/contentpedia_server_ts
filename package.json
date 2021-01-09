@@ -2,14 +2,18 @@
     "name": "contentpedia-server",
     "version": "1.3.0",
     "private": true,
+    "license": "MIT",
     "author": "Victor Ryabkov <victor.ryabkov.business@gmail.com>",
+    "main": "src/app.ts",
     "repository": {
         "type": "git",
         "url": "https://github.com/moiskillnadne/contentpedia_server_ts"
     },
     "dependencies": {
         "@babel/core": "7.9.0",
+        "@mikro-orm/cli": "^4.3.4",
         "@mikro-orm/core": "^4.3.4",
+        "@mikro-orm/migrations": "^4.3.4",
         "@mikro-orm/mongodb": "^4.3.4",
         "@mikro-orm/postgresql": "^4.3.4",
         "@sentry/node": "^5.29.0",
@@ -138,5 +142,11 @@
         "eslint-plugin-import": "^2.22.1",
         "eslint-plugin-jest": "^24.1.0",
         "prettier": "^2.1.2"
+    },
+    "mikro-orm": {
+        "useTsNode": true,
+        "configPaths": [
+            "./src/orm.config.ts"
+        ]
     }
 }

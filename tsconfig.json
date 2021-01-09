@@ -8,8 +8,10 @@
     "paths": {
       "@/*": ["./*"]
     },
-    "experimentalDecorators": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "allowJs": true,
+    "sourceMap": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -24,6 +26,7 @@
     "removeComments": true
   },
   "include": [
-    "src"
-  ]
+    "./src/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
 }
