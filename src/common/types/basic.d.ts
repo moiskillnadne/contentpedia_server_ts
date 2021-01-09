@@ -1,3 +1,5 @@
+import { DeepReadonly } from './util'
+
 export type Writeable<T> = { -readonly [P in keyof T]-?: T[P] }
 
 export type ChannelBlockOption = DeepReadonly<{

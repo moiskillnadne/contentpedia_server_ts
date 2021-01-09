@@ -16,6 +16,7 @@
         "@mikro-orm/postgresql": "^4.3.4",
         "@mikro-orm/reflection": "^4.3.4",
         "@mikro-orm/sqlite": "^4.3.4",
+        "@savchenko91/rc-redux-api-mw": "^1.0.21",
         "@sentry/node": "^5.29.0",
         "@sentry/tracing": "^5.29.0",
         "@types/bcrypt": "^3.0.0",
@@ -135,6 +136,7 @@
         ]
     },
     "devDependencies": {
+        "@mikro-orm/cli": "^4.3.4",
         "eslint": "^7.17.0",
         "eslint-config-airbnb": "18.2.0",
         "eslint-config-airbnb-typescript": "^12.0.0",
@@ -143,13 +145,7 @@
         "eslint-loader": "^4.0.2",
         "eslint-plugin-import": "^2.22.1",
         "eslint-plugin-jest": "^24.1.0",
-        "prettier": "^2.1.2"
-    },
-    "mikro-orm": {
-        "useTsNode": true,
-        "configPaths": [
-            "./src/mikro-orm.config.ts"
-        ]
+        "prettier": "^2.1.2",
+        "ts-node": "^9.1.1"
     }
-
 }
