@@ -4,6 +4,7 @@ import * as Tracing from '@sentry/tracing'
 import c from 'colors'
 import bodyParser from 'body-parser'
 import mongoose from 'mongoose'
+import Sequelize from '@/db/sequelize'
 
 // Utils
 import videoRouter from '@/route/v1/videoDetails'
@@ -34,15 +35,18 @@ mongoose.connect(DB_URI as string, {
   useUnifiedTopology: true,
 })
 mongoose.connection.on('connected', () => {
-  console.info(c.green('Connected to DB successfuly!'))
+  console.info(c.green('Successfully connected to MongoDB!'))
 })
 mongoose.connection.on('error', (err) => {
   if (!err) return
-  console.error(c.red('Connect to DB failed!'))
+  console.error(c.red('Connecting to MongoDB failed!'))
   console.error(err)
 })
 mongoose.set('useFindAndModify', false)
 mongoose.set('useCreateIndex', true)
+Sequelize.authenticate()
+  .then(() => console.info(c.green('Successfully connected to Postgres!')))
+  .catch((err) => console.error(c.red('Connecting to Postgres failed..'), err))
 
 // Middlewares
 app.use(Sentry.Handlers.requestHandler())
