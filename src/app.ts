@@ -4,6 +4,9 @@ import * as Tracing from '@sentry/tracing'
 import c from 'colors'
 import bodyParser from 'body-parser'
 import mongoose from 'mongoose'
+import { EntityManager, MikroORM, RequestContext } from '@mikro-orm/core'
+import User from '@/db/entities/User'
+import Details from '@/db/entities/UserDetails'
 
 // Utils
 import videoRouter from '@/route/v1/videoDetails'
@@ -12,6 +15,11 @@ import jwtMiddleware from '@/middleware/jwt'
 
 const { PORT_SERVER = 5555, DB_URI } = process.env
 const app = express()
+
+const DI = {} as {
+  orm: MikroORM
+  em: EntityManager
+}
 
 // Connections
 Sentry.init({
@@ -34,15 +42,28 @@ mongoose.connect(DB_URI as string, {
   useUnifiedTopology: true,
 })
 mongoose.connection.on('connected', () => {
-  console.info(c.green('Connected to DB successfuly!'))
+  console.info(c.green('Connected to MongoDB successfuly!'))
 })
 mongoose.connection.on('error', (err) => {
   if (!err) return
-  console.error(c.red('Connect to DB failed!'))
+  console.error(c.red('Connect to MongoDB failed!'))
   console.error(err)
 })
 mongoose.set('useFindAndModify', false)
 mongoose.set('useCreateIndex', true)
+
+const ormInit = async () => {
+  try {
+    DI.orm = await MikroORM.init()
+    console.log(await DI.orm.isConnected())
+
+    // const user = new User('superid', 'email', 'password')
+    // await orm.em.persistAndFlush(user)
+  } catch (err) {
+    console.error(err)
+  }
+}
+ormInit()
 
 // Middlewares
 app.use(Sentry.Handlers.requestHandler())
@@ -50,6 +71,9 @@ app.use(Sentry.Handlers.tracingHandler()) // TracingHandler creates a trace for 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(jwtMiddleware)
+app.use((req, res, next) => {
+  RequestContext.create(DI.orm.em, next)
+})
 
 // Routes
 app.use('/api/v1/videoDetails/', videoRouter)

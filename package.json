@@ -64,6 +64,7 @@
         "reflect-metadata": "^0.1.13",
         "resolve": "1.15.0",
         "saslprep": "^1.0.3",
+        "ts-node": "^9.1.1",
         "ts-pnp": "1.1.6",
         "typescript": "~3.7.2",
         "webpack": "4.42.0",
@@ -146,7 +147,7 @@
     "mikro-orm": {
         "useTsNode": true,
         "configPaths": [
-            "./src/orm.config.ts"
+            "./src/orm.config.json"
         ]
     }
 }

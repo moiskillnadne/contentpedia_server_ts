@@ -1,18 +1,16 @@
-import { MikroORM } from '@mikro-orm/core'
-
 export default {
+  type: 'postgresql',
   migrations: {
     path: './src/migrations',
     tableName: 'migrations',
     transactional: true,
   },
-  tsNode: process.env.NODE_DEV === 'true',
+  tsNode: true,
   user: 'vtcehnnr',
   password: 'WJWMFRgbmjQzDmnFWITvgw7lSxI6ZmMw',
   dbName: 'vtcehnnr',
   host: 'postgres://vtcehnnr:WJWMFRgbmjQzDmnFWITvgw7lSxI6ZmMw@hattie.db.elephantsql.com',
   port: 5432,
-  entities: ['src/db/entities/*.ts'],
-  entitiesTs: ['src/db/entities/*.ts'],
-  type: 'postgresql',
-} as Parameters<typeof MikroORM.init>[0]
+  entities: ['/Users/victorryabkov/projects/contentpedia_server_ts/src/db/entities'],
+  entitiesTs: ['/Users/victorryabkov/projects/contentpedia_server_ts/src/db/entities'],,
+}
