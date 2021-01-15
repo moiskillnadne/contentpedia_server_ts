@@ -1,18 +1,18 @@
 import express, { Response } from 'express'
 
 // Utils
-import { VideoModel } from '@/db/model/videoDetails'
-import videoItemCreator from '@/util/videoItemCreator'
 import { errorHandler } from '@/util/common'
+import * as validate from '@/util/validate'
 import { formatterToPreviewLink, getVideoIDFromUrl } from '@/util/urlParser'
 import { Request } from '@/types/types'
+import MongoHandler from '@/db/MongoHandler'
 
 const router = express.Router()
 
 router.get('/', async (req: Request, res: Response) => {
   req.protect?.()
   try {
-    const dbResult = await VideoModel.find().exec()
+    const dbResult = await MongoHandler.getAllRelease()
     if (!dbResult.length) res.status(204).json({ msg: 'Is empty!' })
 
     res.status(200).json(dbResult)
@@ -23,11 +23,13 @@ router.get('/', async (req: Request, res: Response) => {
 
 router.post('/', async (req: Request, res: Response) => {
   req.protect?.()
-  const { channel, video, guest, recommendation } = req.body
+  const { isComplete, channel, video, guest, recommendation } = req.body
+
+  const errors = await validate.isExist(req.body, ['isComplete', 'channel', 'video', 'guest', 'recommendation'])
+  if (errors.length !== 0) res.status(400).json({ err: 'Bad request. Some fields empty', fields: errors })
 
   try {
-    const videoDetails = videoItemCreator(channel, video, guest, recommendation)
-    const result = await videoDetails.save()
+    const result = await MongoHandler.addRelease(isComplete, channel, video, guest, recommendation)
     res.status(200).json({
       msg: 'Saved successful!',
       success: result,
@@ -40,8 +42,11 @@ router.post('/', async (req: Request, res: Response) => {
 router.delete('/:id', async (req: Request, res: Response) => {
   req.protect?.()
   const { id } = req.params
+  const errors = await validate.isExist({ id }, ['id'])
+  if (errors.length !== 0) res.status(400).json({ err: 'Bad request. Some fields empty', fields: errors })
+
   try {
-    const result = await VideoModel.remove({ _id: id }).exec()
+    const result = await MongoHandler.deleteReleaseByID(id)
     res.status(200).json({
       msg: 'Removed successful!',
       success: result,
@@ -56,15 +61,25 @@ router.put('/:id', async (req: Request, res: Response) => {
   const { id } = req.params
   const { body } = req
 
+  const errors = await validate.isExist({ id, ...body }, [
+    'id',
+    'isComplete',
+    'channel',
+    'video',
+    'guest',
+    'recommendation',
+  ])
+  if (errors.length !== 0) res.status(400).json({ err: 'Bad request. Some fields empty', fields: errors })
+
   try {
-    const result = await VideoModel.updateOne({ _id: id }, { $set: { ...body } })
-    if (result.ok) {
-      const video = await VideoModel.findById(id).exec()
-      res.status(200).json({
-        msg: 'Successfuly updated!',
-        modifiedItem: video,
-      })
-    }
+    const result = await MongoHandler.updateReleaseByID(id, body)
+
+    const video = await MongoHandler.getOneRelease(id)
+    res.status(200).json({
+      status: result.ok,
+      msg: 'Successfuly updated!',
+      modifiedItem: video,
+    })
   } catch (err) {
     errorHandler(err, res, 'Item updating failed!')
   }
@@ -73,8 +88,11 @@ router.put('/:id', async (req: Request, res: Response) => {
 router.get('/getOne/:id', async (req: Request, res: Response) => {
   req.protect?.()
   const { id } = req.params
+  const errors = await validate.isExist({ id }, ['id'])
+  if (errors.length !== 0) res.status(400).json({ err: 'Bad request. Some fields empty', fields: errors })
+
   try {
-    const video = await VideoModel.findById(id).exec()
+    const video = await MongoHandler.getOneRelease(id)
     if (!video) res.status(204).json({ msg: 'Is empty!' })
     res.status(200).json(video)
   } catch (err) {

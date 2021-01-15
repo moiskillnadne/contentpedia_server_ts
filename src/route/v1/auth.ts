@@ -3,7 +3,6 @@ import * as jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 
 // Utils
-import { UserModel } from '@/db/model/user'
 import { Request } from '@/types/types'
 import { errorHandler, hashPassword } from '@/util/common'
 import * as validate from '@/util/validate'

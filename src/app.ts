@@ -7,10 +7,9 @@ import mongoose from 'mongoose'
 import Sequelize from '@/db/sequelize'
 
 // Utils
-import videoRouter from '@/route/v1/videoDetails'
+import videoRouter from '@/route/v1/release'
 import userRouter from '@/route/v1/auth'
 import jwtMiddleware from '@/middleware/jwt'
-import releaseRouter from '@/route/v2/release'
 
 const { PORT_SERVER = 5555, DB_URI } = process.env
 const app = express()
@@ -57,9 +56,8 @@ app.use(bodyParser.json())
 app.use(jwtMiddleware)
 
 // Routes
-app.use('/api/v1/videoDetails/', videoRouter)
+app.use('/api/v1/release', videoRouter)
 app.use('/api/v1/auth', userRouter)
-app.use('/api/v2/release', releaseRouter)
 
 // Test
 app.get('/', function rootHandler(req: Request, res: Response) {
