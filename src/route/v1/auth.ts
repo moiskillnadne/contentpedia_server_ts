@@ -6,17 +6,18 @@ import bcrypt from 'bcryptjs'
 import { Request } from '@/types/types'
 import { errorHandler, hashPassword } from '@/util/common'
 import * as validate from '@/util/validate'
-import PostgresHandler from '@/db/PostgresHandler'
-import MongoHandler from '@/db/MongoHandler'
+import PostgresUserController from '@/db/sequelize/controller/User'
+import MongoUserController from '@/db/mongo/controller/User'
+import { UserModel } from '@/common/types/state'
 
 const router = express.Router()
 
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const users = await PostgresHandler.getAllUser()
+    const users = await PostgresUserController.getAllUser()
     res.send(users)
   } catch (err) {
-    console.error(err)
+    errorHandler(err, res, 'Cant get user from DB..')
   }
 })
 
@@ -29,8 +30,8 @@ router.post('/', async (req: Request, res: Response) => {
 
     const hashedPass = await hashPassword(password)
 
-    await MongoHandler.addUser({ email, password: hashedPass, firstName, lastName, role })
-    await PostgresHandler.addUser({ email, password: hashedPass, firstName, lastName, role })
+    await MongoUserController.addUser({ email, password: hashedPass, firstName, lastName, role })
+    await PostgresUserController.addUser({ email, password: hashedPass, firstName, lastName, role })
 
     res.status(200).json({ msg: 'User was added.' })
   } catch (err) {
@@ -44,21 +45,30 @@ router.post('/login', async (req: Request, res: Response) => {
     const errors = await validate.isExist({ email, password }, ['email', 'password'])
     if (errors.length !== 0) res.status(400).json({ err: 'Bad request. Some fields empty', fields: errors })
 
-    let user
+    const mongoPromise = new Promise((resolve) => {
+      resolve(
+        MongoUserController.getOneUserBy('email', email).then((result) => ({
+          db: 'Mongo',
+          data: result,
+        })),
+      )
+    })
+    const postgresPromise = new Promise((resolve) => {
+      resolve(
+        PostgresUserController.getOneUserBy('email', email).then((result) => ({
+          db: 'Postgres',
+          data: result,
+        })),
+      )
+    })
 
-    // Try to get user from Mongo
-    user = await MongoHandler.getOneUserBy('email', email)
-
-    // If Mongo result is empty, try get user from Postgres
-    if (!user) {
-      user = await PostgresHandler.getOneUserBy('email', email)
-    }
+    const user = (await Promise.race([mongoPromise, postgresPromise])) as { db: string; data: UserModel }
 
     if (!user) res.status(401).json({ msg: 'User is not exist!' })
-    const isCompare = await bcrypt.compareSync(password, user?.get('password'))
+    const isCompare = bcrypt.compareSync(password, user?.data?.password)
     if (!isCompare) res.status(401).json({ msg: 'Password incorrect!' })
 
-    const tokens = generateJWT(user?.get('_id' || 'id') as string)
+    const tokens = generateJWT(user.data?._id as string)
 
     res.status(200).json(tokens)
   } catch (err) {
@@ -81,10 +91,10 @@ router.post('/update', async (req: Request, res: Response) => {
   try {
     switch (type) {
       case 'mongo':
-        await MongoHandler.updateOneUserField(id, props, value)
+        await MongoUserController.updateOneUserField(id, props, value)
         break
       case 'postgres':
-        await PostgresHandler.updateOneUserField(id, props, value)
+        await PostgresUserController.updateOneUserField(id, props, value)
         break
       default:
         res.status(400).json({ msg: 'Bad request. Invalid type!' })

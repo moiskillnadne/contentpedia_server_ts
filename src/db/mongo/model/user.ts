@@ -1,4 +1,4 @@
-import { model, Schema, Document, SchemaTypes } from 'mongoose'
+import { model, Schema, Document } from 'mongoose'
 import { v4 } from 'uuid'
 
 export const DOCUMENT_NAME = 'User'

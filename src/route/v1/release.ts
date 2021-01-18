@@ -5,8 +5,8 @@ import { errorHandler } from '@/util/common'
 import * as validate from '@/util/validate'
 import { formatterToPreviewLink, getVideoIDFromUrl } from '@/util/urlParser'
 import { Request } from '@/types/types'
-import MongoHandler from '@/db/MongoHandler'
-import PostgresHandler from '@/db/PostgresHandler'
+import MongoReleaseController from '@/db/mongo/controller/Release'
+import PostgresReleaseController from '@/db/sequelize/controller/Release'
 import { v4 } from 'uuid'
 
 const router = express.Router()
@@ -16,14 +16,14 @@ router.get('/', async (req: Request, res: Response) => {
   try {
     const postgresPromise = new Promise((resolve) => {
       resolve(
-        PostgresHandler.getAllRelease().then((result) => ({
+        PostgresReleaseController.getAllRelease().then((result) => ({
           db: 'postgres',
           data: result,
         })),
       )
     })
     const mongoPromise = new Promise((resolve) => {
-      resolve(MongoHandler.getAllRelease().then((result) => ({ db: 'Mongo', data: result })))
+      resolve(MongoReleaseController.getAllRelease().then((result) => ({ db: 'Mongo', data: result })))
     })
     const dbResult = await Promise.race([postgresPromise, mongoPromise])
 
@@ -44,7 +44,7 @@ router.post('/', async (req: Request, res: Response) => {
   try {
     const postgresPromise = new Promise((resolve) => {
       resolve(
-        PostgresHandler.addRelease(uuid, isComplete, channel, video, guest, recommendation).then((result) => ({
+        PostgresReleaseController.addRelease(uuid, isComplete, channel, video, guest, recommendation).then((result) => ({
           db: 'Postgres',
           data: result,
         })),
@@ -52,7 +52,7 @@ router.post('/', async (req: Request, res: Response) => {
     })
     const mongoPromise = new Promise((resolve) => {
       resolve(
-        MongoHandler.addRelease(uuid, isComplete, channel, video, guest, recommendation).then((result) => ({
+        MongoReleaseController.addRelease(uuid, isComplete, channel, video, guest, recommendation).then((result) => ({
           db: 'Mongo',
           data: result,
         })),
@@ -78,7 +78,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const postgresPromise = new Promise((resolve) => {
       resolve(
-        PostgresHandler.deleteOneReleaseByUuid(id).then((result) => ({
+        PostgresReleaseController.deleteOneReleaseByUuid(id).then((result) => ({
           db: 'Postgres',
           data: result,
         })),
@@ -86,7 +86,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
     })
     const mongoPromise = new Promise((resolve) => {
       resolve(
-        MongoHandler.deleteReleaseByUuid(id).then((result) => ({
+        MongoReleaseController.deleteReleaseByUuid(id).then((result) => ({
           db: 'Mongo',
           data: result,
         })),
@@ -121,7 +121,7 @@ router.put('/:id', async (req: Request, res: Response) => {
   try {
     const mongoPromise = new Promise((resolve) => {
       resolve(
-        MongoHandler.updateReleaseByUuid(id, body).then((result) => ({
+        MongoReleaseController.updateReleaseByUuid(id, body).then((result) => ({
           db: 'Mongo',
           data: result,
         })),
@@ -129,7 +129,7 @@ router.put('/:id', async (req: Request, res: Response) => {
     })
     const postgresPromise = new Promise((resolve) => {
       resolve(
-        PostgresHandler.updateReleaseByUuid(id, body).then((result) => ({
+        PostgresReleaseController.updateReleaseByUuid(id, body).then((result) => ({
           db: 'Postgres',
           data: result,
         })),
@@ -157,7 +157,7 @@ router.get('/:id', async (req: Request, res: Response) => {
   try {
     const postgresPromise = new Promise((resolve) => {
       resolve(
-        PostgresHandler.getReleaseById(id).then((result) => ({
+        PostgresReleaseController.getReleaseById(id).then((result) => ({
           db: 'Postgres',
           data: result,
         })),
@@ -165,7 +165,7 @@ router.get('/:id', async (req: Request, res: Response) => {
     })
     const mongoPromise = new Promise((resolve) => {
       resolve(
-        MongoHandler.getOneRelease(id).then((result) => ({
+        MongoReleaseController.getOneRelease(id).then((result) => ({
           db: 'Mongo',
           data: result,
         })),
