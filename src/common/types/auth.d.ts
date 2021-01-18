@@ -11,6 +11,8 @@ export type TokenModel = DeepReadonly<{
 }>
 
 export type User = {
+  id?: string
+  _id?: string
   email: string
   password: string
   firstName: string
