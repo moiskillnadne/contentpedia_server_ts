@@ -75,6 +75,7 @@ class MongoHandler {
   }
 
   public addRelease = async (
+    uuid: string,
     isComplete: boolean,
     channel: Channel,
     video: Video,
@@ -85,6 +86,7 @@ class MongoHandler {
     const previewUrl = utils.formatterToPreviewLink(videoID)
 
     const release = new ReleaseModel({
+      uuid,
       isComplete,
       channel: {
         title: channel.title,
@@ -117,17 +119,17 @@ class MongoHandler {
     }
   }
 
-  public deleteReleaseByID = async (id: string) => {
+  public deleteReleaseByUuid = async (uuid: string) => {
     try {
-      const result = await ReleaseModel.deleteOne({ id }).exec()
+      const result = await ReleaseModel.deleteOne({ uuid }).exec()
       return result
     } catch (err) {
       throw new Error()
     }
   }
 
-  public updateReleaseByID = async (id: string, video: Record<string, unknown>) => {
-    const result = await ReleaseModel.updateOne({ id }, { ...video }, {}, (err, res) => {
+  public updateReleaseByUuid = async (uuid: string, video: Record<string, unknown>) => {
+    const result = await ReleaseModel.updateOne({ uuid }, { ...video }, {}, (err, res) => {
       if (err) throw new Error(err)
       return res
     }).exec()

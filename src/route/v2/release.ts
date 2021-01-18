@@ -1,7 +1,7 @@
 import express, { Response } from 'express'
 import { Request } from '@/types/types'
 import db from '@/db/sequelize'
-import Release from '@/db/sequelize/models/Release'
+import { Release } from '@/db/sequelize/models/Release'
 
 const router = express.Router()
 

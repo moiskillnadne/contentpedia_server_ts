@@ -12,6 +12,11 @@ const videoSchema: Schema = new Schema<Vmodel.ReleaseModel>(
       default: v4,
       required: true,
     },
+    uuid: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     isComplete: {
       type: Boolean,
       required: true,

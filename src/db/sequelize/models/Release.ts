@@ -2,24 +2,31 @@ import Sequelize from 'sequelize'
 
 import db from '@/db/sequelize/index'
 
-const Release = db.define('releases', {
-  id: {
-    type: Sequelize.UUID,
-    primaryKey: true,
-    defaultValue: Sequelize.UUIDV4,
+export const Release = db.define(
+  'Release',
+  {
+    uuid: Sequelize.DataTypes.UUID,
+    isComplete: Sequelize.DataTypes.BOOLEAN,
+    channel: {
+      type: Sequelize.DataTypes.JSONB,
+      allowNull: false,
+    },
+    video: {
+      type: Sequelize.DataTypes.JSONB,
+      allowNull: false,
+    },
+    guest: {
+      type: Sequelize.DataTypes.JSONB,
+      allowNull: false,
+    },
+    recommendation: {
+      type: Sequelize.DataTypes.JSONB,
+      allowNull: false,
+    },
   },
-  channel: {
-    type: Sequelize.JSONB,
+  {
+    tableName: 'Releases',
   },
-  video: {
-    type: Sequelize.JSONB,
-  },
-  guest: {
-    type: Sequelize.JSONB,
-  },
-  recommendation: {
-    type: Sequelize.JSONB,
-  },
-})
+)
 
-export default Release
+export const test = 'test'

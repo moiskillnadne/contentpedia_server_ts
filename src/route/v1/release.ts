@@ -6,14 +6,26 @@ import * as validate from '@/util/validate'
 import { formatterToPreviewLink, getVideoIDFromUrl } from '@/util/urlParser'
 import { Request } from '@/types/types'
 import MongoHandler from '@/db/MongoHandler'
+import PostgresHandler from '@/db/PostgresHandler'
+import { v4 } from 'uuid'
 
 const router = express.Router()
 
 router.get('/', async (req: Request, res: Response) => {
   req.protect?.()
   try {
-    const dbResult = await MongoHandler.getAllRelease()
-    if (!dbResult.length) res.status(204).json({ msg: 'Is empty!' })
+    const postgresPromise = new Promise((resolve) => {
+      resolve(
+        PostgresHandler.getAllRelease().then((result) => ({
+          db: 'postgres',
+          data: result,
+        })),
+      )
+    })
+    const mongoPromise = new Promise((resolve) => {
+      resolve(MongoHandler.getAllRelease().then((result) => ({ db: 'Mongo', data: result })))
+    })
+    const dbResult = await Promise.race([postgresPromise, mongoPromise])
 
     res.status(200).json(dbResult)
   } catch (err) {
@@ -24,12 +36,30 @@ router.get('/', async (req: Request, res: Response) => {
 router.post('/', async (req: Request, res: Response) => {
   req.protect?.()
   const { isComplete, channel, video, guest, recommendation } = req.body
+  const uuid = v4()
 
   const errors = await validate.isExist(req.body, ['isComplete', 'channel', 'video', 'guest', 'recommendation'])
   if (errors.length !== 0) res.status(400).json({ err: 'Bad request. Some fields empty', fields: errors })
 
   try {
-    const result = await MongoHandler.addRelease(isComplete, channel, video, guest, recommendation)
+    const postgresPromise = new Promise((resolve) => {
+      resolve(
+        PostgresHandler.addRelease(uuid, isComplete, channel, video, guest, recommendation).then((result) => ({
+          db: 'Postgres',
+          data: result,
+        })),
+      )
+    })
+    const mongoPromise = new Promise((resolve) => {
+      resolve(
+        MongoHandler.addRelease(uuid, isComplete, channel, video, guest, recommendation).then((result) => ({
+          db: 'Mongo',
+          data: result,
+        })),
+      )
+    })
+    const result = await Promise.all([postgresPromise, mongoPromise])
+
     res.status(200).json({
       msg: 'Saved successful!',
       success: result,
@@ -46,7 +76,24 @@ router.delete('/:id', async (req: Request, res: Response) => {
   if (errors.length !== 0) res.status(400).json({ err: 'Bad request. Some fields empty', fields: errors })
 
   try {
-    const result = await MongoHandler.deleteReleaseByID(id)
+    const postgresPromise = new Promise((resolve) => {
+      resolve(
+        PostgresHandler.deleteOneReleaseByUuid(id).then((result) => ({
+          db: 'Postgres',
+          data: result,
+        })),
+      )
+    })
+    const mongoPromise = new Promise((resolve) => {
+      resolve(
+        MongoHandler.deleteReleaseByUuid(id).then((result) => ({
+          db: 'Mongo',
+          data: result,
+        })),
+      )
+    })
+
+    const result = await Promise.all([postgresPromise, mongoPromise])
     res.status(200).json({
       msg: 'Removed successful!',
       success: result,
@@ -72,27 +119,62 @@ router.put('/:id', async (req: Request, res: Response) => {
   if (errors.length !== 0) res.status(400).json({ err: 'Bad request. Some fields empty', fields: errors })
 
   try {
-    const result = await MongoHandler.updateReleaseByID(id, body)
+    const mongoPromise = new Promise((resolve) => {
+      resolve(
+        MongoHandler.updateReleaseByUuid(id, body).then((result) => ({
+          db: 'Mongo',
+          data: result,
+        })),
+      )
+    })
+    const postgresPromise = new Promise((resolve) => {
+      resolve(
+        PostgresHandler.updateReleaseByUuid(id, body).then((result) => ({
+          db: 'Postgres',
+          data: result,
+        })),
+      )
+    })
 
-    const video = await MongoHandler.getOneRelease(id)
+    const result = await Promise.all([mongoPromise, postgresPromise])
+
+    // const video = await MongoHandler.getOneRelease(id)
     res.status(200).json({
-      status: result.ok,
       msg: 'Successfuly updated!',
-      modifiedItem: video,
+      status: result,
     })
   } catch (err) {
     errorHandler(err, res, 'Item updating failed!')
   }
 })
 
-router.get('/getOne/:id', async (req: Request, res: Response) => {
+router.get('/:id', async (req: Request, res: Response) => {
   req.protect?.()
   const { id } = req.params
   const errors = await validate.isExist({ id }, ['id'])
   if (errors.length !== 0) res.status(400).json({ err: 'Bad request. Some fields empty', fields: errors })
 
   try {
-    const video = await MongoHandler.getOneRelease(id)
+    const postgresPromise = new Promise((resolve) => {
+      resolve(
+        PostgresHandler.getReleaseById(id).then((result) => ({
+          db: 'Postgres',
+          data: result,
+        })),
+      )
+    })
+    const mongoPromise = new Promise((resolve) => {
+      resolve(
+        MongoHandler.getOneRelease(id).then((result) => ({
+          db: 'Mongo',
+          data: result,
+        })),
+      )
+    })
+    const video = await Promise.all([postgresPromise, mongoPromise]).then((values) => {
+      const releases = values.filter((item: any) => item.data !== null)
+      return releases[0]
+    })
     if (!video) res.status(204).json({ msg: 'Is empty!' })
     res.status(200).json(video)
   } catch (err) {
