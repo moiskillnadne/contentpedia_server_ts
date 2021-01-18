@@ -1,5 +1,5 @@
-import { UserModel } from '@/db/model/user'
-import { ReleaseModel } from '@/db/model/release'
+import { UserModel } from '@/db/mongo/model/user'
+import { ReleaseModel } from '@/db/mongo/model/release'
 import * as utils from '@/util/urlParser'
 import { RecommendationContentState } from '@/common/types/state'
 
