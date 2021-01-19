@@ -2,7 +2,6 @@ import { DeepReadonly } from '@/common/types/util.d'
 
 export type ReleaseModel = DeepReadonly<{
    _id?: string
-   uuid?: string
    id?: string
   } & RawReleaseModel>
 
