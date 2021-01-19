@@ -31,3 +31,29 @@ export async function hashPassword(password: any): Promise<string> {
   console.log(hash)
   return hash
 }
+
+export function createPromises<T>(
+  mongoController: (props?: any) => any,
+  postgresController: (props?: any) => any,
+  props?: T,
+): Array<Promise<any>> {
+  const mongoPromise = new Promise((resolve) => {
+    resolve(
+      mongoController(props ?? props).then((result: any) => ({
+        db: 'Mongo',
+        data: result,
+      })),
+    )
+  })
+
+  const postgresPromise = new Promise((resolve) => {
+    resolve(
+      postgresController(props ?? props).then((result: any) => ({
+        db: 'Postgres',
+        data: result,
+      })),
+    )
+  })
+
+  return [mongoPromise, postgresPromise]
+}

@@ -1,20 +1,27 @@
 import express, { Response } from 'express'
 import * as jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
+import { v4 } from 'uuid'
 
 // Utils
-import { Request } from '@/types/types'
-import { errorHandler, hashPassword } from '@/util/common'
+import { errorHandler, hashPassword, createPromises } from '@/util/common'
 import * as validate from '@/util/validate'
+
+// Types
+import { User } from '@/common/types/auth'
+import { Request } from '@/types/types'
+
+// Controllers
 import PostgresUserController from '@/db/sequelize/controller/User'
 import MongoUserController from '@/db/mongo/controller/User'
-import { UserModel } from '@/common/types/state'
 
 const router = express.Router()
 
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const users = await PostgresUserController.getAllUser()
+    const dbPromises = createPromises(MongoUserController.getAllUser, PostgresUserController.getAllUser)
+    const users = await Promise.race(dbPromises)
+
     res.send(users)
   } catch (err) {
     errorHandler(err, res, 'Cant get user from DB..')
@@ -29,11 +36,19 @@ router.post('/', async (req: Request, res: Response) => {
     if (errors.length !== 0) res.status(400).json({ err: 'Bad request. Some fields empty', fields: errors })
 
     const hashedPass = await hashPassword(password)
+    const id = v4()
 
-    await MongoUserController.addUser({ email, password: hashedPass, firstName, lastName, role })
-    await PostgresUserController.addUser({ email, password: hashedPass, firstName, lastName, role })
+    const dbPromises = createPromises(MongoUserController.addUser, PostgresUserController.addUser, {
+      id,
+      email,
+      password: hashedPass,
+      firstName,
+      lastName,
+      role,
+    } as User)
+    const result = await Promise.all(dbPromises)
 
-    res.status(200).json({ msg: 'User was added.' })
+    res.status(200).json({ msg: 'User was added.', result })
   } catch (err) {
     errorHandler(err, res, 'Unable to save new user!')
   }
@@ -45,30 +60,18 @@ router.post('/login', async (req: Request, res: Response) => {
     const errors = await validate.isExist({ email, password }, ['email', 'password'])
     if (errors.length !== 0) res.status(400).json({ err: 'Bad request. Some fields empty', fields: errors })
 
-    const mongoPromise = new Promise((resolve) => {
-      resolve(
-        MongoUserController.getOneUserBy('email', email).then((result) => ({
-          db: 'Mongo',
-          data: result,
-        })),
-      )
-    })
-    const postgresPromise = new Promise((resolve) => {
-      resolve(
-        PostgresUserController.getOneUserBy('email', email).then((result) => ({
-          db: 'Postgres',
-          data: result,
-        })),
-      )
+    const dbPromise = createPromises(MongoUserController.getUserBy, PostgresUserController.getUserBy, {
+      props: 'email',
+      value: email,
     })
 
-    const user = (await Promise.race([mongoPromise, postgresPromise])) as { db: string; data: UserModel }
+    const user = (await Promise.race(dbPromise)) as { db: string; data: User }
 
     if (!user) res.status(401).json({ msg: 'User is not exist!' })
     const isCompare = bcrypt.compareSync(password, user?.data?.password)
     if (!isCompare) res.status(401).json({ msg: 'Password incorrect!' })
 
-    const tokens = generateJWT(user.data?._id as string)
+    const tokens = generateJWT((user.data?._id || user?.data?.id) as string)
 
     res.status(200).json(tokens)
   } catch (err) {
@@ -84,26 +87,37 @@ router.post('/refresh', async (req: Request, res: Response) => {
 })
 
 router.post('/update', async (req: Request, res: Response) => {
-  const { id, type, props, value } = req.body
-  const errors = await validate.isExist(req.body, ['id', 'type', 'props', 'value'])
+  const { id, props, value } = req.body
+  const errors = await validate.isExist(req.body, ['id', 'props', 'value'])
   if (errors.length !== 0) res.status(400).json({ err: 'Bad request. Some fields empty', fields: errors })
 
   try {
-    switch (type) {
-      case 'mongo':
-        await MongoUserController.updateOneUserField(id, props, value)
-        break
-      case 'postgres':
-        await PostgresUserController.updateOneUserField(id, props, value)
-        break
-      default:
-        res.status(400).json({ msg: 'Bad request. Invalid type!' })
-        break
-    }
+    const dbPromise = createPromises(MongoUserController.updateUserByID, PostgresUserController.updateUserByID, {
+      id,
+      props,
+      value,
+    })
 
-    res.status(200).json({ msg: 'Item was successfully updated!' })
+    const result = await Promise.all(dbPromise)
+
+    res.status(200).json({ msg: 'Item was successfully updated!', result })
   } catch (err) {
     errorHandler(err, res, 'Cant update item!')
+  }
+})
+
+router.delete('/', async (req: Request, res: Response) => {
+  const { id } = req.body
+  const errors = await validate.isExist(req.body, ['id'])
+  if (errors.length !== 0) res.status(400).json({ err: 'Bad request. Some fields empty', fields: errors })
+
+  try {
+    const dbPromise = createPromises(MongoUserController.deleteUserByID, PostgresUserController.deleteUserByID, { id })
+
+    const result = await Promise.all(dbPromise)
+    res.status(200).json({ msg: 'Successfully deleted!', data: result })
+  } catch (err) {
+    errorHandler(err, res, 'Cant delete users!')
   }
 })
 

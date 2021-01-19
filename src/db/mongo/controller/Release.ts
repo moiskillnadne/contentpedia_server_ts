@@ -1,10 +1,9 @@
 import { ReleaseModel } from '@/db/mongo/model/release'
 import * as utils from '@/util/urlParser'
 import { RecommendationContentState } from '@/common/types/state'
-import * as release from '@/common/types/release'
+import * as releaseTypes from '@/common/types/release'
 
 class MongoReleaseController {
-
   // GET
   public getAllRelease = async () => {
     try {
@@ -14,6 +13,7 @@ class MongoReleaseController {
       throw new Error(err)
     }
   }
+
   public getOneRelease = async (id: string) => {
     try {
       const result = await ReleaseModel.findOne({ id }).exec()
@@ -24,60 +24,34 @@ class MongoReleaseController {
   }
 
   // POST
-  public addRelease = async (
-    uuid: string,
-    isComplete: boolean,
-    channel: release.ChannelModel,
-    video: release.VideoDetailsModel,
-    guest: release.GuestModel,
-    recommendation: RecommendationContentState,
-  ) => {
-    const videoID = utils.getVideoIDFromUrl(video.url)
+  public addRelease = async (data: {
+    id: string
+    isComplete: boolean
+    channel: releaseTypes.ChannelModel
+    video: releaseTypes.VideoDetailsModel
+    guest: releaseTypes.GuestModel
+    recommendation: RecommendationContentState
+  }) => {
+    const videoID = utils.getVideoIDFromUrl(data.video.url)
     const previewUrl = utils.formatterToPreviewLink(videoID)
 
-    const release = new ReleaseModel({
-      uuid,
-      isComplete,
-      channel: {
-        title: channel.title,
-        url: channel.url,
-      },
-      video: {
-        title: video.title,
-        url: video.url,
-        previewUrl,
-      },
-      guest: {
-        firstname: guest.firstname,
-        lastname: guest.lastname,
-        middlename: guest.middlename,
-        birthDate: guest.birthDate,
-        profession: guest.profession,
-      },
-      recommendation: {
-        video: recommendation.video,
-        audio: recommendation.audio,
-        text: recommendation.text,
-      },
-    })
+    const release = new ReleaseModel({ ...data, video: { ...data.video, previewUrl } })
 
     try {
-      const result = await release.save()
-      return result
+      return await release.save()
     } catch (err) {
       throw new Error(err)
     }
   }
 
   // UPDATE
-  public updateReleaseByUuid = async (uuid: string, video: release.ReleaseModel) => {
+  public updateReleaseByUuid = async (uuid: string, video: releaseTypes.ReleaseModel) => {
     const result = await ReleaseModel.updateOne({ uuid }, { ...video }, {}, (err, res) => {
       if (err) throw new Error(err)
       return res
     }).exec()
     return result
   }
-
 
   // DELETE
   public deleteReleaseByUuid = async (uuid: string) => {
@@ -88,8 +62,6 @@ class MongoReleaseController {
       throw new Error()
     }
   }
-
-
 }
 
 export default new MongoReleaseController()

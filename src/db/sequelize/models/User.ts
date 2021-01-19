@@ -5,6 +5,12 @@ import pg from '@/db/sequelize'
 export const User = pg.define(
   'User',
   {
+    id: {
+      type: DataTypes.UUID,
+      unique: true,
+      allowNull: false,
+      primaryKey: true,
+    },
     email: {
       type: DataTypes.STRING,
       unique: true,

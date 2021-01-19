@@ -1,31 +1,26 @@
 import express, { Response } from 'express'
+import { v4 } from 'uuid'
 
 // Utils
-import { errorHandler } from '@/util/common'
+import { errorHandler, createPromises } from '@/util/common'
 import * as validate from '@/util/validate'
 import { formatterToPreviewLink, getVideoIDFromUrl } from '@/util/urlParser'
+
+// Types
 import { Request } from '@/types/types'
+
+// Controllers
 import MongoReleaseController from '@/db/mongo/controller/Release'
 import PostgresReleaseController from '@/db/sequelize/controller/Release'
-import { v4 } from 'uuid'
 
 const router = express.Router()
 
 router.get('/', async (req: Request, res: Response) => {
   req.protect?.()
   try {
-    const postgresPromise = new Promise((resolve) => {
-      resolve(
-        PostgresReleaseController.getAllRelease().then((result) => ({
-          db: 'postgres',
-          data: result,
-        })),
-      )
-    })
-    const mongoPromise = new Promise((resolve) => {
-      resolve(MongoReleaseController.getAllRelease().then((result) => ({ db: 'Mongo', data: result })))
-    })
-    const dbResult = await Promise.race([postgresPromise, mongoPromise])
+    const dbPromise = createPromises(MongoReleaseController.getAllRelease, PostgresReleaseController.getAllRelease)
+
+    const dbResult = await Promise.race(dbPromise)
 
     res.status(200).json(dbResult)
   } catch (err) {
@@ -36,29 +31,22 @@ router.get('/', async (req: Request, res: Response) => {
 router.post('/', async (req: Request, res: Response) => {
   req.protect?.()
   const { isComplete, channel, video, guest, recommendation } = req.body
-  const uuid = v4()
 
   const errors = await validate.isExist(req.body, ['isComplete', 'channel', 'video', 'guest', 'recommendation'])
   if (errors.length !== 0) res.status(400).json({ err: 'Bad request. Some fields empty', fields: errors })
 
+  const id = v4()
+
   try {
-    const postgresPromise = new Promise((resolve) => {
-      resolve(
-        PostgresReleaseController.addRelease(uuid, isComplete, channel, video, guest, recommendation).then((result) => ({
-          db: 'Postgres',
-          data: result,
-        })),
-      )
+    const dbPromise = createPromises(MongoReleaseController.addRelease, PostgresReleaseController.addRelease, {
+      id,
+      isComplete,
+      channel,
+      video,
+      guest,
+      recommendation,
     })
-    const mongoPromise = new Promise((resolve) => {
-      resolve(
-        MongoReleaseController.addRelease(uuid, isComplete, channel, video, guest, recommendation).then((result) => ({
-          db: 'Mongo',
-          data: result,
-        })),
-      )
-    })
-    const result = await Promise.all([postgresPromise, mongoPromise])
+    const result = await Promise.all(dbPromise)
 
     res.status(200).json({
       msg: 'Saved successful!',

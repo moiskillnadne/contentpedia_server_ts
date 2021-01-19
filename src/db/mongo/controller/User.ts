@@ -12,9 +12,9 @@ class MongoUserController {
     }
   }
 
-  public getOneUserBy = async (props: string, value: string | number) => {
+  public getUserBy = async (data: { props: string; value: string | number }) => {
     try {
-      const users = await UserModel.findOne({ [props]: value }).exec()
+      const users = await UserModel.findOne({ [data.props]: data.value }).exec()
       return users
     } catch (err) {
       throw new Error(err)
@@ -25,21 +25,30 @@ class MongoUserController {
   public addUser = async (obj: User) => {
     try {
       const user = new UserModel(obj)
-      await user.save()
+      return await user.save()
     } catch (err) {
       throw new Error(err)
     }
   }
 
   // UPDATE
-  public updateOneUserField = async (id: string, props: string, value: string | number) => {
+  public updateUserByID = async (data: { id: string; props: string; value: string | number }) => {
     try {
-      await UserModel.updateOne({ id }, { [props]: value })
+      return await UserModel.updateOne({ id: data.id }, { [data.props]: data.value })
     } catch (err) {
       throw new Error(err)
     }
   }
+
   // DELETE
+  public deleteUserByID = async (data: { id: string }) => {
+    try {
+      const result = await UserModel.deleteOne({ id: data.id })
+      return result
+    } catch (err) {
+      throw new Error(err)
+    }
+  }
 }
 
 export default new MongoUserController()

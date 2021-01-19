@@ -4,26 +4,19 @@ import { RecommendationContentState } from '@/common/types/state'
 import * as releaseTypes from '@/common/types/release'
 
 class PostgresReleaseController {
-  public addRelease = async (
-    uuid: string,
-    isComplete: boolean,
-    channel: releaseTypes.ChannelModel,
-    video: releaseTypes.VideoDetailsModel,
-    guest: releaseTypes.GuestModel,
-    recommendation: RecommendationContentState,
-  ) => {
-    const videoID = utils.getVideoIDFromUrl(video.url)
+  public addRelease = async (data: {
+    id: string
+    isComplete: boolean
+    channel: releaseTypes.ChannelModel
+    video: releaseTypes.VideoDetailsModel
+    guest: releaseTypes.GuestModel
+    recommendation: RecommendationContentState
+  }) => {
+    const videoID = utils.getVideoIDFromUrl(data.video.url)
     const previewUrl = utils.formatterToPreviewLink(videoID)
 
     try {
-      const release = await Release.create({
-        uuid,
-        isComplete,
-        channel,
-        video: { ...video, previewUrl },
-        guest,
-        recommendation,
-      })
+      const release = await Release.create({ ...data, video: { ...data.video, previewUrl } })
       const res = await release.save()
       return res
     } catch (err) {

@@ -1,24 +1,14 @@
-import { model, Schema, Document } from 'mongoose'
-import { v4 } from 'uuid'
+import { model, Schema } from 'mongoose'
 
 export const DOCUMENT_NAME = 'User'
 export const COLLECTION_NAME = 'users'
-
-export default interface User extends Document {
-  id: string
-  email: string
-  password: string
-  firstName: string
-  lastName: string
-  role: string
-}
 
 const userSchema: Schema = new Schema(
   {
     id: {
       type: String,
-      default: v4,
       required: true,
+      unique: true,
     },
     email: {
       type: String,
@@ -51,4 +41,4 @@ const userSchema: Schema = new Schema(
   },
 )
 
-export const UserModel = model<User>(DOCUMENT_NAME, userSchema, COLLECTION_NAME)
+export const UserModel = model(DOCUMENT_NAME, userSchema, COLLECTION_NAME)

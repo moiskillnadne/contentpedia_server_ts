@@ -5,8 +5,16 @@ import db from '@/db/sequelize/index'
 export const Release = db.define(
   'Release',
   {
-    uuid: Sequelize.DataTypes.UUID,
-    isComplete: Sequelize.DataTypes.BOOLEAN,
+    id: {
+      type: Sequelize.DataTypes.UUID,
+      unique: true,
+      allowNull: false,
+      primaryKey: true,
+    },
+    isComplete: {
+      type: Sequelize.DataTypes.BOOLEAN,
+      allowNull: false,
+    },
     channel: {
       type: Sequelize.DataTypes.JSONB,
       allowNull: false,

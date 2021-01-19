@@ -12,11 +12,11 @@ class PostgresUserController {
     }
   }
 
-  public getOneUserBy = async (props: string, value: string | number) => {
+  public getUserBy = async (data: { props: string; value: string | number }) => {
     try {
       const users = await User.findAll({
         where: {
-          [props]: value,
+          [data.props]: data.value,
         },
       })
       return users[0]
@@ -29,23 +29,33 @@ class PostgresUserController {
   public addUser = async (obj: auth.User) => {
     try {
       const user = await User.create(obj)
-      await user.save()
+      return await user.save()
     } catch (err) {
       throw new Error(err)
     }
   }
 
   // UPDATE
-  public updateOneUserField = async (id: string, props: string, value: string | number) => {
+  public updateUserByID = async (data: { id: string; props: string; value: string | number }) => {
     try {
-      await User.update(
-        { [props]: value },
+      return await User.update(
+        { [data.props]: data.value },
         {
           where: {
-            id,
+            id: data.id,
           },
         },
       )
+    } catch (err) {
+      throw new Error(err)
+    }
+  }
+
+  // DELETE
+  public deleteUserByID = async (data: { id: string }) => {
+    try {
+      const result = await User.destroy({ where: { id: data.id } })
+      return result
     } catch (err) {
       throw new Error(err)
     }

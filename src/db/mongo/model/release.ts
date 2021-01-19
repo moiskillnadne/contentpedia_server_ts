@@ -1,6 +1,5 @@
 import { model, Schema } from 'mongoose'
-import * as Vmodel from '@/common/types/videoModel'
-import { v4 } from 'uuid'
+import * as Vmodel from '@/common/types/release'
 
 export const DOCUMENT_NAME = 'Release'
 export const COLLECTION_NAME = 'releases'
@@ -8,11 +7,6 @@ export const COLLECTION_NAME = 'releases'
 const videoSchema: Schema = new Schema<Vmodel.ReleaseModel>(
   {
     id: {
-      type: String,
-      default: v4,
-      required: true,
-    },
-    uuid: {
       type: String,
       required: true,
       unique: true,
