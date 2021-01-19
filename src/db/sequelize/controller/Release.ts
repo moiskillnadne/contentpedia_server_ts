@@ -17,8 +17,7 @@ class PostgresReleaseController {
 
     try {
       const release = await Release.create({ ...data, video: { ...data.video, previewUrl } })
-      const res = await release.save()
-      return res
+      return await release.save()
     } catch (err) {
       throw new Error(err)
     }
@@ -26,8 +25,7 @@ class PostgresReleaseController {
 
   public getAllRelease = async () => {
     try {
-      const release = await Release.findAll()
-      return release
+      return await Release.findAll()
     } catch (err) {
       throw new Error(err)
     }
@@ -35,32 +33,29 @@ class PostgresReleaseController {
 
   public getReleaseById = async (id: string) => {
     try {
-      const release = await Release.findOne({
+      return await Release.findOne({
         where: {
           id,
         },
       })
-      return release
     } catch (err) {
       throw new Error(err)
     }
   }
 
-  public deleteOneReleaseByUuid = async (uuid: string) => {
+  public deleteReleaseByID = async (id: string) => {
     try {
-      const result = await Release.destroy({
-        where: { uuid },
+      return await Release.destroy({
+        where: { id },
       })
-      return result
     } catch (err) {
       throw new Error(err)
     }
   }
 
-  public updateReleaseByUuid = async (uuid: string, release: releaseTypes.ReleaseModel) => {
+  public updateReleaseByID = async (data: { id: string; release: releaseTypes.ReleaseModel }) => {
     try {
-      const result = await Release.update({ ...release }, { where: { uuid } })
-      return result
+      return await Release.update({ ...data.release }, { where: { id: data.id } })
     } catch (err) {
       throw new Error(err)
     }

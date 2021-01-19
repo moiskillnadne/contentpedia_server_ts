@@ -7,8 +7,7 @@ class MongoReleaseController {
   // GET
   public getAllRelease = async () => {
     try {
-      const result = await ReleaseModel.find().exec()
-      return result
+      return await ReleaseModel.find().exec()
     } catch (err) {
       throw new Error(err)
     }
@@ -16,8 +15,7 @@ class MongoReleaseController {
 
   public getOneRelease = async (id: string) => {
     try {
-      const result = await ReleaseModel.findOne({ id }).exec()
-      return result
+      return await ReleaseModel.findOne({ id }).exec()
     } catch (err) {
       throw new Error(err)
     }
@@ -35,9 +33,9 @@ class MongoReleaseController {
     const videoID = utils.getVideoIDFromUrl(data.video.url)
     const previewUrl = utils.formatterToPreviewLink(videoID)
 
-    const release = new ReleaseModel({ ...data, video: { ...data.video, previewUrl } })
-
     try {
+      const release = new ReleaseModel({ ...data, video: { ...data.video, previewUrl } })
+
       return await release.save()
     } catch (err) {
       throw new Error(err)
@@ -45,19 +43,18 @@ class MongoReleaseController {
   }
 
   // UPDATE
-  public updateReleaseByUuid = async (uuid: string, video: releaseTypes.ReleaseModel) => {
-    const result = await ReleaseModel.updateOne({ uuid }, { ...video }, {}, (err, res) => {
-      if (err) throw new Error(err)
-      return res
-    }).exec()
-    return result
+  public updateReleaseByID = async (data: { id: string; video: releaseTypes.ReleaseModel }) => {
+    try {
+      return await ReleaseModel.updateOne({ id: data.id }, { ...data.video }, {}).exec()
+    } catch (err) {
+      throw new Error(err)
+    }
   }
 
   // DELETE
-  public deleteReleaseByUuid = async (uuid: string) => {
+  public deleteReleaseByID = async (id: string) => {
     try {
-      const result = await ReleaseModel.deleteOne({ uuid }).exec()
-      return result
+      return await ReleaseModel.deleteOne({ id }).exec()
     } catch (err) {
       throw new Error()
     }

@@ -64,24 +64,13 @@ router.delete('/:id', async (req: Request, res: Response) => {
   if (errors.length !== 0) res.status(400).json({ err: 'Bad request. Some fields empty', fields: errors })
 
   try {
-    const postgresPromise = new Promise((resolve) => {
-      resolve(
-        PostgresReleaseController.deleteOneReleaseByUuid(id).then((result) => ({
-          db: 'Postgres',
-          data: result,
-        })),
-      )
-    })
-    const mongoPromise = new Promise((resolve) => {
-      resolve(
-        MongoReleaseController.deleteReleaseByUuid(id).then((result) => ({
-          db: 'Mongo',
-          data: result,
-        })),
-      )
-    })
+    const dbPromise = createPromises(
+      MongoReleaseController.deleteReleaseByID,
+      PostgresReleaseController.deleteReleaseByID,
+      id,
+    )
 
-    const result = await Promise.all([postgresPromise, mongoPromise])
+    const result = await Promise.all(dbPromise)
     res.status(200).json({
       msg: 'Removed successful!',
       success: result,
@@ -107,26 +96,14 @@ router.put('/:id', async (req: Request, res: Response) => {
   if (errors.length !== 0) res.status(400).json({ err: 'Bad request. Some fields empty', fields: errors })
 
   try {
-    const mongoPromise = new Promise((resolve) => {
-      resolve(
-        MongoReleaseController.updateReleaseByUuid(id, body).then((result) => ({
-          db: 'Mongo',
-          data: result,
-        })),
-      )
-    })
-    const postgresPromise = new Promise((resolve) => {
-      resolve(
-        PostgresReleaseController.updateReleaseByUuid(id, body).then((result) => ({
-          db: 'Postgres',
-          data: result,
-        })),
-      )
-    })
+    const dbPromise = createPromises(
+      MongoReleaseController.updateReleaseByID,
+      PostgresReleaseController.updateReleaseByID,
+      { id, body },
+    )
 
-    const result = await Promise.all([mongoPromise, postgresPromise])
+    const result = await Promise.all(dbPromise)
 
-    // const video = await MongoHandler.getOneRelease(id)
     res.status(200).json({
       msg: 'Successfuly updated!',
       status: result,
@@ -143,23 +120,9 @@ router.get('/:id', async (req: Request, res: Response) => {
   if (errors.length !== 0) res.status(400).json({ err: 'Bad request. Some fields empty', fields: errors })
 
   try {
-    const postgresPromise = new Promise((resolve) => {
-      resolve(
-        PostgresReleaseController.getReleaseById(id).then((result) => ({
-          db: 'Postgres',
-          data: result,
-        })),
-      )
-    })
-    const mongoPromise = new Promise((resolve) => {
-      resolve(
-        MongoReleaseController.getOneRelease(id).then((result) => ({
-          db: 'Mongo',
-          data: result,
-        })),
-      )
-    })
-    const video = await Promise.all([postgresPromise, mongoPromise]).then((values) => {
+    const dbPromise = createPromises(MongoReleaseController.getOneRelease, PostgresReleaseController.getReleaseById, id)
+
+    const video = await Promise.all(dbPromise).then((values) => {
       const releases = values.filter((item: any) => item.data !== null)
       return releases[0]
     })
