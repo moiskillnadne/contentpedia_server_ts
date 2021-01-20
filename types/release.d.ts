@@ -1,9 +1,9 @@
 import { DeepReadonly } from '@/common/types/util.d'
 
 export type ReleaseModel = DeepReadonly<{
-   _id?: string
-   id?: string
-  } & RawReleaseModel>
+  _id?: string
+  id: string
+} & RawReleaseModel>
 
 export type RawReleaseModel = DeepReadonly<
   GeneralReleaseModel & {
