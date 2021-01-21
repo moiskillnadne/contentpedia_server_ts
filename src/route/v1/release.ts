@@ -8,6 +8,7 @@ import { formatterToPreviewLink, getVideoIDFromUrl } from '@/util/urlParser'
 
 // Types
 import { Request } from '@/types/types'
+import { channelBlockOption } from '@/common/constants/options'
 
 // Controllers
 import MongoReleaseController from '@/db/mongo/controller/Release'
@@ -33,15 +34,20 @@ router.post('/', async (req: Request, res: Response) => {
   const { isComplete, channel, video, guest, recommendation } = req.body
 
   const errors = await validate.isExist(req.body, ['isComplete', 'channel', 'video', 'guest', 'recommendation'])
-  if (errors.length !== 0) res.status(400).json({ err: 'Bad request. Some fields empty', fields: errors })
+  if (errors.length !== 0) {
+    res.status(400).json({ err: 'Bad request. Some fields empty', fields: errors })
+    return
+  }
 
   const id = v4()
+  const option = channelBlockOption.filter((item) => item.text === channel.title)
+  const modifiedChannel = { ...channel, url: option[0].value }
 
   try {
     const dbPromise = createPromises(MongoReleaseController.addRelease, PostgresReleaseController.addRelease, {
       id,
       isComplete,
-      channel,
+      channel: modifiedChannel,
       video,
       guest,
       recommendation,
@@ -93,13 +99,16 @@ router.put('/:id', async (req: Request, res: Response) => {
     'guest',
     'recommendation',
   ])
-  if (errors.length !== 0) res.status(400).json({ err: 'Bad request. Some fields empty', fields: errors })
+  if (errors.length !== 0) {
+    res.status(400).json({ err: 'Bad request. Some fields empty', fields: errors })
+    return
+  }
 
   try {
     const dbPromise = createPromises(
       MongoReleaseController.updateReleaseByID,
       PostgresReleaseController.updateReleaseByID,
-      { id, body },
+      { id, release: { ...body } },
     )
 
     const result = await Promise.all(dbPromise)

@@ -43,6 +43,9 @@ const videoSchema: Schema = new Schema<Vmodel.ReleaseModel>(
       },
     },
     guest: {
+      nickname: {
+        type: String,
+      },
       firstname: {
         type: String,
         required: true,

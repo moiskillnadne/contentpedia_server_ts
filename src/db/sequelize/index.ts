@@ -1,5 +1,5 @@
 import { Sequelize } from 'sequelize'
 
-export default new Sequelize(
-  'postgres://vtcehnnr:WJWMFRgbmjQzDmnFWITvgw7lSxI6ZmMw@hattie.db.elephantsql.com:5432/vtcehnnr',
-)
+const { SEQ_URI } = process.env
+
+export default new Sequelize(SEQ_URI as string)

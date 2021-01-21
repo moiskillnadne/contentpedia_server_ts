@@ -43,9 +43,16 @@ class MongoReleaseController {
   }
 
   // UPDATE
-  public updateReleaseByID = async (data: { id: string; video: releaseTypes.ReleaseModel }) => {
+  public updateReleaseByID = async (data: { id: string; release: releaseTypes.ReleaseModel }) => {
+    const videoID = utils.getVideoIDFromUrl(data.release.video.url)
+    const previewUrl = utils.formatterToPreviewLink(videoID)
+
     try {
-      return await ReleaseModel.updateOne({ id: data.id }, { ...data.video }, {}).exec()
+      return await ReleaseModel.updateOne(
+        { id: data.id },
+        { $set: { ...data.release, video: { ...data.release.video, previewUrl } } },
+        {},
+      ).exec()
     } catch (err) {
       throw new Error(err)
     }
