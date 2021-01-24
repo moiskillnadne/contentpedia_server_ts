@@ -28,6 +28,23 @@ router.get('/', async (req: Request, res: Response) => {
   }
 })
 
+router.post('/getOneUser', async (req: Request, res: Response) => {
+  const { email } = req.body
+  const errors = await validate.isExist({ email }, ['email'])
+  if (errors.length !== 0) res.status(400).json({ err: 'Bad request. Some fields empty', fields: errors })
+
+  try {
+    const dbPromises = createPromises(MongoUserController.getUserBy, PostgresUserController.getUserBy, {
+      props: 'email',
+      value: email,
+    })
+    const user = await Promise.race(dbPromises)
+    res.status(200).json(user)
+  } catch (err) {
+    errorHandler(err, res, 'Cant to find user with props!')
+  }
+})
+
 router.post('/', async (req: Request, res: Response) => {
   try {
     const { email, password, firstName, lastName, role } = req.body
