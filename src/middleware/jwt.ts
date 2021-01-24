@@ -16,7 +16,7 @@ export default function (req: Request, res: Response, next: NextFunction) {
         return jwt.verify(token, process.env.JWT_SECRET || '')
       } catch (err) {
         res.status(401).json({ msg: 'Token expired!' })
-        next(new Error('AXuet'))
+        next(new Error('Token expired'))
       }
     }
   }

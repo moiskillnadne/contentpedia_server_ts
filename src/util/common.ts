@@ -37,22 +37,26 @@ export function createPromises<T>(
   postgresController: (props?: any) => any,
   props?: T,
 ): Array<Promise<any>> {
-  const mongoPromise = new Promise((resolve) => {
-    resolve(
-      mongoController(props ?? props).then((result: any) => ({
-        db: 'Mongo',
-        data: result,
-      })),
-    )
+  const mongoPromise = new Promise((resolve, reject) => {
+    mongoController(props ?? props)
+      .then((result: any) =>
+        resolve({
+          db: 'Mongo',
+          data: result,
+        }),
+      )
+      .catch((err: any) => reject(err))
   })
 
-  const postgresPromise = new Promise((resolve) => {
-    resolve(
-      postgresController(props ?? props).then((result: any) => ({
-        db: 'Postgres',
-        data: result,
-      })),
-    )
+  const postgresPromise = new Promise((resolve, reject) => {
+    postgresController(props ?? props)
+      .then((result: any) =>
+        resolve({
+          db: 'Postgres',
+          data: result,
+        }),
+      )
+      .catch((err: any) => reject(err))
   })
 
   return [mongoPromise, postgresPromise]
