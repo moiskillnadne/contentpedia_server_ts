@@ -21,6 +21,15 @@ class MongoReleaseController {
     }
   }
 
+  public getReleasePerPage = async (page: number) => {
+    const query = ReleaseModel.aggregate()
+    const result = await ReleaseModel.aggregatePaginate(query, { page, limit: 20 }, (err, res) => {
+      if (err) throw new Error(err)
+      return res
+    })
+    return result
+  }
+
   // POST
   public addRelease = async (data: {
     id: string
@@ -46,7 +55,6 @@ class MongoReleaseController {
   public updateReleaseByID = async (data: { id: string; release: releaseTypes.ReleaseModel }) => {
     const videoID = utils.getVideoIDFromUrl(data.release.video.url)
     const previewUrl = utils.formatterToPreviewLink(videoID)
-
     try {
       return await ReleaseModel.updateOne(
         { id: data.id },

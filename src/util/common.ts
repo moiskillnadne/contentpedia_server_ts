@@ -1,6 +1,7 @@
 import c from 'colors'
 import { Response } from 'express'
 import bcrypt from 'bcryptjs'
+import * as validate from '@/util/validate'
 
 export function isProvided(obj: Record<string, unknown>, varsName?: string) {
   const keys = Object.keys(obj)
@@ -23,6 +24,15 @@ export function isProvided(obj: Record<string, unknown>, varsName?: string) {
 export function errorHandler(err: Error, res: Response, msg: string) {
   res.status(500).json({ msg: 'Something go wrong.. :/', error: err.toString() })
   throw new Error(`${c.red(msg)} ${err.toString()}`)
+}
+
+export async function isExistHandler<K extends string, V>(data: Record<K, V>, requiredProps: Array<K>, res: Response) {
+  const errors = await validate.isExist(data, requiredProps)
+  if (errors.length !== 0) {
+    res.status(400).json({ err: 'Bad request. Some fields empty', fields: errors })
+    return false
+  }
+  return true
 }
 
 export async function hashPassword(password: any): Promise<string> {

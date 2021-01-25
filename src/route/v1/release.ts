@@ -23,7 +23,7 @@ router.get('/', async (req: Request, res: Response) => {
 
     const dbResult = await Promise.race(dbPromise)
 
-    res.status(200).json(dbResult)
+    res.status(200).json({ ...dbResult, dataCount: dbResult.data.length })
   } catch (err) {
     errorHandler(err, res, 'Getting items from DB failed!')
   }

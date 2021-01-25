@@ -9,6 +9,7 @@ import Sequelize from '@/db/sequelize'
 // Utils
 import videoRouter from '@/route/v1/release'
 import userRouter from '@/route/v1/auth'
+import releaseRouter from '@/route/v2/release'
 import jwtMiddleware from '@/middleware/jwt'
 
 const { PORT_SERVER = 5555, DB_URI } = process.env
@@ -58,6 +59,7 @@ app.use(jwtMiddleware)
 // Routes
 app.use('/api/v1/release', videoRouter)
 app.use('/api/v1/auth', userRouter)
+app.use('/api/v2/release', releaseRouter)
 
 // Test
 app.get('/', function rootHandler(req: Request, res: Response) {

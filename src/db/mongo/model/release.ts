@@ -1,5 +1,6 @@
 import { model, Schema } from 'mongoose'
 import * as Vmodel from '@/common/types/release'
+import pagination from 'mongoose-aggregate-paginate-v2'
 
 export const DOCUMENT_NAME = 'Release'
 export const COLLECTION_NAME = 'releases'
@@ -164,5 +165,7 @@ const videoSchema: Schema = new Schema<Vmodel.ReleaseModel>(
     timestamps: true,
   },
 )
+
+videoSchema.plugin(pagination)
 
 export const ReleaseModel = model(DOCUMENT_NAME, videoSchema, COLLECTION_NAME)

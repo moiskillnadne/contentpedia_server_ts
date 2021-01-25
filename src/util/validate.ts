@@ -11,3 +11,16 @@ export async function isExist<K extends string, V>(body: Record<K, V>, expected:
   }
   return errors
 }
+
+export const requestValidationSchema = {
+  isComplete: {
+    isBoolean: true,
+    errorMessage: 'AXUET',
+  },
+  channel: {
+    title: {},
+  },
+  guest: {},
+  video: {},
+  recommendation: {},
+}
