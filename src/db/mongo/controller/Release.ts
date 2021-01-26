@@ -22,8 +22,26 @@ class MongoReleaseController {
   }
 
   public getReleasePerPage = async (page: number) => {
-    const query = ReleaseModel.aggregate()
-    const result = await ReleaseModel.aggregatePaginate(query, { page, limit: 20 }, (err, res) => {
+    const query = {}
+    const result = await ReleaseModel.paginate(query, { page, limit: 20 }, (err, res) => {
+      if (err) throw new Error(err)
+      return res
+    })
+    return result
+  }
+
+  public getCompletedPerPage = async (page: number) => {
+    const query = { isComplete: true }
+    const result = await ReleaseModel.paginate(query, { page, limit: 20 }, (err, res) => {
+      if (err) throw new Error(err)
+      return res
+    })
+    return result
+  }
+
+  public getInprocessPerPage = async (page: number) => {
+    const query = { isComplete: false }
+    const result = await ReleaseModel.paginate(query, { page, limit: 20 }, (err, res) => {
       if (err) throw new Error(err)
       return res
     })

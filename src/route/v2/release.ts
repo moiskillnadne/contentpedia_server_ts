@@ -42,6 +42,40 @@ router.post('/page/:page', param('page', 'Not exist'), async (req: Request, res:
   }
 })
 
+router.post('/completed/page/:page', param('page', 'Not exist'), async (req: Request, res: Response) => {
+  req.protect?.()
+  const { page } = req.params
+
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() })
+  }
+
+  try {
+    const result = await MongoReleaseController.getCompletedPerPage(Number(page))
+    res.status(200).json(result)
+  } catch (err) {
+    errorHandler(err, res, 'Getting items from DB failed!')
+  }
+})
+
+router.post('/inprocess/page/:page', param('page', 'Not exist'), async (req: Request, res: Response) => {
+  req.protect?.()
+  const { page } = req.params
+
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() })
+  }
+
+  try {
+    const result = await MongoReleaseController.getInprocessPerPage(Number(page))
+    res.status(200).json(result)
+  } catch (err) {
+    errorHandler(err, res, 'Getting items from DB failed!')
+  }
+})
+
 router.post(
   '/',
   body('isComplete').exists().withMessage('Field is empty').isBoolean().withMessage('Field should be true or false'),
