@@ -45,6 +45,7 @@ router.post('/page/:page', param('page', 'Not exist'), async (req: Request, res:
 router.post('/completed/page/:page', param('page', 'Not exist'), async (req: Request, res: Response) => {
   req.protect?.()
   const { page } = req.params
+  const { query } = req.body
 
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
@@ -52,7 +53,7 @@ router.post('/completed/page/:page', param('page', 'Not exist'), async (req: Req
   }
 
   try {
-    const result = await MongoReleaseController.getCompletedPerPage(Number(page))
+    const result = await MongoReleaseController.getCompletedPerPage(Number(page), query)
     res.status(200).json(result)
   } catch (err) {
     errorHandler(err, res, 'Getting items from DB failed!')
@@ -62,6 +63,7 @@ router.post('/completed/page/:page', param('page', 'Not exist'), async (req: Req
 router.post('/inprocess/page/:page', param('page', 'Not exist'), async (req: Request, res: Response) => {
   req.protect?.()
   const { page } = req.params
+  const { query } = req.body
 
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
@@ -69,7 +71,7 @@ router.post('/inprocess/page/:page', param('page', 'Not exist'), async (req: Req
   }
 
   try {
-    const result = await MongoReleaseController.getInprocessPerPage(Number(page))
+    const result = await MongoReleaseController.getInprocessPerPage(Number(page), query)
     res.status(200).json(result)
   } catch (err) {
     errorHandler(err, res, 'Getting items from DB failed!')

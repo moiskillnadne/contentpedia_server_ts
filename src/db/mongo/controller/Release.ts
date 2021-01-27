@@ -30,8 +30,13 @@ class MongoReleaseController {
     return result
   }
 
-  public getCompletedPerPage = async (page: number) => {
-    const query = { isComplete: true }
+  public getCompletedPerPage = async (page: number, searchQuery?: { props: string; value: string }) => {
+    let query: any
+    query = { isComplete: true }
+    if (searchQuery?.props) {
+      const reg = { [searchQuery.props]: { $regex: searchQuery.value, $options: 'gi' } }
+      query = { ...query, ...reg }
+    }
     const result = await ReleaseModel.paginate(query, { page, limit: 20 }, (err, res) => {
       if (err) throw new Error(err)
       return res
@@ -39,8 +44,13 @@ class MongoReleaseController {
     return result
   }
 
-  public getInprocessPerPage = async (page: number) => {
-    const query = { isComplete: false }
+  public getInprocessPerPage = async (page: number, searchQuery?: { props: string; value: string }) => {
+    let query: any
+    query = { isComplete: false }
+    if (searchQuery?.props) {
+      const reg = { [searchQuery.props]: { $regex: searchQuery.value, $options: 'gi' } }
+      query = { ...query, ...reg }
+    }
     const result = await ReleaseModel.paginate(query, { page, limit: 20 }, (err, res) => {
       if (err) throw new Error(err)
       return res
