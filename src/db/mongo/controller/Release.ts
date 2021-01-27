@@ -31,7 +31,7 @@ class MongoReleaseController {
   }
 
   public getCompletedPerPage = async (page: number, searchQuery?: { props: string; value: string }) => {
-    let query: any
+    let query: Record<string, string | boolean | Record<string, string>>
     query = { isComplete: true }
     if (searchQuery?.props) {
       const reg = { [searchQuery.props]: { $regex: searchQuery.value, $options: 'gi' } }
@@ -45,7 +45,7 @@ class MongoReleaseController {
   }
 
   public getInprocessPerPage = async (page: number, searchQuery?: { props: string; value: string }) => {
-    let query: any
+    let query: Record<string, string | boolean | Record<string, string>>
     query = { isComplete: false }
     if (searchQuery?.props) {
       const reg = { [searchQuery.props]: { $regex: searchQuery.value, $options: 'gi' } }
